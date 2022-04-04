@@ -1,19 +1,11 @@
 import {
 	ActionIcon,
-	Avatar,
 	createStyles,
 	Group,
 	Navbar,
 	useMantineColorScheme,
 } from '@mantine/core';
 import React, { useState } from 'react';
-import {
-	GoogleLogin,
-	GoogleLoginResponse,
-	GoogleLoginResponseOffline,
-	GoogleLogout,
-	useGoogleLogout,
-} from 'react-google-login';
 import { Link } from 'react-router-dom';
 import {
 	Home,
@@ -112,9 +104,6 @@ const useStyles = createStyles((theme, _params, getRef) => {
 	};
 });
 
-const clientId =
-	'612496123801-rqf590fa2gata78m3qvfvqheeabpe93b.apps.googleusercontent.com';
-
 const routes = [
 	{ link: '/', label: 'Home', icon: Home },
 	{ link: 'activities/favorites', label: 'Favorites', icon: Star },
@@ -135,8 +124,6 @@ export default function VerticalNavbar() {
 	const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 	const isDark = colorScheme === 'dark';
 
-	const [user, setUser] = useState<GoogleLoginResponse | undefined>();
-
 	const links = routes.map((item) => (
 		<Link
 			className={cx(classes.link, {
@@ -156,7 +143,9 @@ export default function VerticalNavbar() {
 	return (
 		<Navbar width={{ xs: !collapsed ? 300 : 80 }} p="md">
 			<Navbar.Section grow>
-				<Group className={classes.header} position="apart">
+				<Group
+					className={classes.header}
+					position={collapsed ? 'center' : 'left'}>
 					<ActionIcon
 						onClick={() => setCollapsed(!collapsed)}
 						title={`${collapsed ? 'Extend' : 'Collapse'} sidebar`}>
@@ -166,48 +155,18 @@ export default function VerticalNavbar() {
 							<LayoutSidebarLeftCollapse size={24} />
 						)}
 					</ActionIcon>
-					{!collapsed && (
-						<ActionIcon
-							onClick={() => toggleColorScheme()}
-							title="Toggle color scheme">
-							{isDark ? <Sun size={24} /> : <MoonStars size={24} />}
-						</ActionIcon>
-					)}
 				</Group>
 				{links}
 			</Navbar.Section>
 
 			<Navbar.Section className={classes.footer}>
-				{user ? (
-					<Group position="apart">
-						<Avatar src={user.profileObj.imageUrl} radius={2} />
-						<GoogleLogout
-							clientId="658977310896-knrl3gka66fldh83dao2rhgbblmd4un9.apps.googleusercontent.com"
-							buttonText={collapsed ? '' : 'Logout'}
-							onLogoutSuccess={() => {
-								console.log('User logged out');
-								setUser(undefined);
-							}}></GoogleLogout>
-					</Group>
-				) : (
-					<Group position="right">
-						<GoogleLogin
-							clientId={clientId}
-							buttonText={collapsed ? '' : 'Login with Google'}
-							onSuccess={(response) => {
-								console.log(response);
-								if ('profileObj' in response) {
-									setUser(response);
-								}
-							}}
-							theme="dark"
-							onFailure={(err) => {
-								console.log(err);
-								setUser(undefined);
-							}}
-							cookiePolicy={'single_host_origin'}></GoogleLogin>
-					</Group>
-				)}
+				<Group position={collapsed ? 'center' : 'left'}>
+					<ActionIcon
+						onClick={() => toggleColorScheme()}
+						title="Toggle color scheme">
+						{isDark ? <Sun size={24} /> : <MoonStars size={24} />}
+					</ActionIcon>
+				</Group>
 			</Navbar.Section>
 		</Navbar>
 	);
