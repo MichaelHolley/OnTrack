@@ -1,18 +1,25 @@
 import {
 	ActionIcon,
+	Avatar,
 	createStyles,
 	Group,
 	Navbar,
 	useMantineColorScheme,
 } from '@mantine/core';
 import React, { useState } from 'react';
+import {
+	GoogleLogin,
+	GoogleLoginResponse,
+	GoogleLoginResponseOffline,
+	GoogleLogout,
+	useGoogleLogout,
+} from 'react-google-login';
 import { Link } from 'react-router-dom';
 import {
 	Home,
 	LayoutSidebarLeftCollapse,
 	LayoutSidebarLeftExpand,
 	List,
-	Logout,
 	MoonStars,
 	Plus,
 	Star,
@@ -105,7 +112,10 @@ const useStyles = createStyles((theme, _params, getRef) => {
 	};
 });
 
-const data = [
+const clientId =
+	'612496123801-rqf590fa2gata78m3qvfvqheeabpe93b.apps.googleusercontent.com';
+
+const routes = [
 	{ link: '/', label: 'Home', icon: Home },
 	{ link: 'favorites', label: 'Favorites', icon: Star },
 	{ link: 'activities', label: 'Activities', icon: List },
@@ -115,7 +125,7 @@ const data = [
 export default function VerticalNavbar() {
 	const { classes, cx } = useStyles();
 	const [activeRoute, setActiveRoute] = useState(
-		window.location.pathname != '/'
+		window.location.pathname !== '/'
 			? window.location.pathname.substring(1)
 			: window.location.pathname
 	);
@@ -125,7 +135,9 @@ export default function VerticalNavbar() {
 	const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 	const isDark = colorScheme === 'dark';
 
-	const links = data.map((item) => (
+	const [user, setUser] = useState<GoogleLoginResponse | undefined>();
+
+	const links = routes.map((item) => (
 		<Link
 			className={cx(classes.link, {
 				[classes.linkActive]:
@@ -166,17 +178,35 @@ export default function VerticalNavbar() {
 			</Navbar.Section>
 
 			<Navbar.Section className={classes.footer}>
-				<a
-					className={classes.link}
-					title="Logout"
-					key={'Logout'}
-					onClick={(event) => {
-						event.preventDefault();
-						console.log('Logout');
-					}}>
-					<Logout className={classes.linkIcon} />
-					{!collapsed && <span className={classes.linkText}>Logout</span>}
-				</a>
+				{user ? (
+					<Group position="apart">
+						<Avatar src={user.profileObj.imageUrl} radius={5} />
+						<GoogleLogout
+							clientId="658977310896-knrl3gka66fldh83dao2rhgbblmd4un9.apps.googleusercontent.com"
+							buttonText={collapsed ? '' : 'Logout'}
+							onLogoutSuccess={() => {
+								console.log('User logged out');
+								setUser(undefined);
+							}}></GoogleLogout>
+					</Group>
+				) : (
+					<Group position="right">
+						<GoogleLogin
+							clientId={clientId}
+							buttonText={collapsed ? '' : 'Login with Google'}
+							onSuccess={(response) => {
+								console.log(response);
+								if ('profileObj' in response) {
+									setUser(response);
+								}
+							}}
+							onFailure={(err) => {
+								console.log(err);
+								setUser(undefined);
+							}}
+							cookiePolicy={'single_host_origin'}></GoogleLogin>
+					</Group>
+				)}
 			</Navbar.Section>
 		</Navbar>
 	);

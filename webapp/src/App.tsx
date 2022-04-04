@@ -2,13 +2,10 @@ import {
 	AppShell,
 	ColorScheme,
 	ColorSchemeProvider,
-	MantineProvider,
-	Navbar,
-	Text,
-	useMantineTheme,
+	MantineProvider
 } from '@mantine/core';
 import { useColorScheme, useLocalStorage } from '@mantine/hooks';
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import VerticalNavbar from './components/Navbar';
 import Activities from './views/Activities';
@@ -18,7 +15,6 @@ import Home from './views/Home';
 
 function App() {
 	const preferredColorScheme = useColorScheme();
-	const [opened, setOpened] = useState(false);
 
 	const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
 		key: 'mantine-color-scheme',
