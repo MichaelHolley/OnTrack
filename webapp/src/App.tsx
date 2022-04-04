@@ -30,12 +30,20 @@ function App() {
 				colorScheme={colorScheme}
 				toggleColorScheme={toggleColorScheme}>
 				<MantineProvider theme={{ colorScheme, primaryColor: 'red' }}>
-					<AppShell navbar={<VerticalNavbar />}>
+					<AppShell
+						navbar={<VerticalNavbar />}
+						sx={(theme) => ({
+							backgroundColor:
+								theme.colorScheme === 'dark'
+									? theme.colors.dark[8]
+									: theme.colors.gray[1],
+							color: theme.colorScheme === 'dark' ? theme.white : theme.black,
+						})}>
 						<Routes>
-							<Route path="" element={<Home />}></Route>
-							<Route path="favorites" element={<Favorites />}></Route>
-							<Route path="activities" element={<Activities />}></Route>
-							<Route path="add" element={<Add />}></Route>
+							<Route path="" element={<Home />} />
+							<Route path="activities" element={<Activities />} />
+							<Route path="activities/favorites" element={<Favorites />} />
+							<Route path="add" element={<Add />} />
 						</Routes>
 					</AppShell>
 				</MantineProvider>

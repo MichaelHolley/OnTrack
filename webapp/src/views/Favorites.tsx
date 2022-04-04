@@ -1,7 +1,8 @@
+import { Title } from '@mantine/core';
 import React from 'react';
 
 const Favorites = () => {
-	return <div>Ich bin Favorites</div>;
+	return <Title>{'Favorites'}</Title>;
 };
 
 export default Favorites;

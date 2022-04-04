@@ -1,7 +1,8 @@
+import { Title } from '@mantine/core';
 import React from 'react';
 
 const Activities = () => {
-	return <div>Ich bin Activities</div>;
+	return <Title>Activities</Title>;
 };
 
 export default Activities;

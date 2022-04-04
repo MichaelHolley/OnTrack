@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
+import { Title } from '@mantine/core';
 
 const Home = () => {
-	const [loginData, setLoginData] = useState(localStorage.getItem('loginData'));
-
-	return <div>Ich bin Home</div>;
+	return <Title>Home</Title>;
 };
 
 export default Home;

@@ -1,7 +1,8 @@
+import { Title } from '@mantine/core';
 import React from 'react';
 
 const Add = () => {
-	return <div>Ich bin Add</div>;
+	return <Title>Add Activity</Title>;
 };
 
 export default Add;

@@ -117,7 +117,7 @@ const clientId =
 
 const routes = [
 	{ link: '/', label: 'Home', icon: Home },
-	{ link: 'favorites', label: 'Favorites', icon: Star },
+	{ link: 'activities/favorites', label: 'Favorites', icon: Star },
 	{ link: 'activities', label: 'Activities', icon: List },
 	{ link: 'add', label: 'Add', icon: Plus },
 ];
@@ -154,7 +154,7 @@ export default function VerticalNavbar() {
 	));
 
 	return (
-		<Navbar width={{ sm: !collapsed ? 300 : 80 }} p="md">
+		<Navbar width={{ xs: !collapsed ? 300 : 80 }} p="md">
 			<Navbar.Section grow>
 				<Group className={classes.header} position="apart">
 					<ActionIcon
@@ -180,7 +180,7 @@ export default function VerticalNavbar() {
 			<Navbar.Section className={classes.footer}>
 				{user ? (
 					<Group position="apart">
-						<Avatar src={user.profileObj.imageUrl} radius={5} />
+						<Avatar src={user.profileObj.imageUrl} radius={2} />
 						<GoogleLogout
 							clientId="658977310896-knrl3gka66fldh83dao2rhgbblmd4un9.apps.googleusercontent.com"
 							buttonText={collapsed ? '' : 'Logout'}
@@ -200,6 +200,7 @@ export default function VerticalNavbar() {
 									setUser(response);
 								}
 							}}
+							theme="dark"
 							onFailure={(err) => {
 								console.log(err);
 								setUser(undefined);
