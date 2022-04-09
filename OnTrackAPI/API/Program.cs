@@ -14,14 +14,21 @@ builder.Services.Configure<OnTrackDatabaseSettings>(
 
 builder.Services.AddSingleton<IActivityService, ActivityService>();
 
+builder.Services.AddCors();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
 
-app.MapGet("/api/activities", ([FromServices] IActivityService activityService) =>
+app.MapGet("/api/activities", ([FromServices] IActivityService activityService, bool? favorites) =>
 {
+	if (!favorites.HasValue)
+	{
+		favorites = false;
+	}
+
 	return Results.Ok(activityService.GetActivities());
 });
 
@@ -32,7 +39,7 @@ app.MapGet("/api/activities/{id}", ([FromServices] IActivityService activityServ
 
 app.MapPost("/api/activities/create", ([FromServices] IActivityService activityService, Activity activity) =>
 {
-	return Results.Ok(activityService.Create(activity));
+	return Results.Created($"/api/activities/{activity.Id}", activityService.Create(activity));
 });
 
 app.MapPut("/api/activities/{id}/addvalue", ([FromServices] IActivityService activityService, Guid id, ActivityValue value) =>
@@ -50,5 +57,7 @@ app.MapDelete("/api/activities/{id}/delete", ([FromServices] IActivityService ac
 	activityService.Delete(id);
 	return Results.Ok();
 });
+
+app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 app.Run();

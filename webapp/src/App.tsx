@@ -4,6 +4,7 @@ import {
 	ColorScheme,
 	ColorSchemeProvider,
 	Group,
+	LoadingOverlay,
 	MantineProvider,
 } from '@mantine/core';
 import { useColorScheme, useLocalStorage } from '@mantine/hooks';
@@ -15,10 +16,11 @@ import GoogleLogin, {
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import VerticalNavbar from './components/Navbar';
 import Activities from './views/Activities';
-import Add from './views/Add';
+import Todo from './views/Todo';
 import Favorites from './views/Favorites';
 import Home from './views/Home';
 
+// TODO: Generate new ID and hide within .env-file
 const clientId =
 	'612496123801-rqf590fa2gata78m3qvfvqheeabpe93b.apps.googleusercontent.com';
 
@@ -34,6 +36,7 @@ function App() {
 		setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
 
 	const [user, setUser] = useState<GoogleLoginResponse | undefined>();
+	const [loading, setLoading] = useState<boolean>(false);
 
 	return (
 		<BrowserRouter>
@@ -54,7 +57,7 @@ function App() {
 							<Group position="right">
 								<Avatar src={user.profileObj.imageUrl} radius={5} />
 								<GoogleLogout
-									clientId="658977310896-knrl3gka66fldh83dao2rhgbblmd4un9.apps.googleusercontent.com"
+									clientId={clientId}
 									buttonText="Logout"
 									onLogoutSuccess={() => {
 										console.log('User logged out');
@@ -81,11 +84,18 @@ function App() {
 									cookiePolicy={'single_host_origin'}></GoogleLogin>
 							</Group>
 						)}
+						<LoadingOverlay visible={loading} />
 						<Routes>
-							<Route path="" element={<Home />} />
-							<Route path="activities" element={<Activities />} />
-							<Route path="activities/favorites" element={<Favorites />} />
-							<Route path="add" element={<Add />} />
+							<Route path="" element={<Home setLoading={setLoading} />} />
+							<Route
+								path="activities"
+								element={<Activities setLoading={setLoading} />}
+							/>
+							<Route
+								path="activities/favorites"
+								element={<Favorites setLoading={setLoading} />}
+							/>
+							<Route path="todo" element={<Todo setLoading={setLoading} />} />
 						</Routes>
 					</AppShell>
 				</MantineProvider>

@@ -5,8 +5,8 @@ interface Props {
 	setLoading: (val: boolean) => void;
 }
 
-const Favorites = (props: Props) => {
-	return <Title>{'Favorites'}</Title>;
+const Todo = (props: Props) => {
+	return <Title>ToDo</Title>;
 };
 
-export default Favorites;
+export default Todo;

@@ -8,12 +8,12 @@ import {
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+	ChartDots,
 	Home,
 	LayoutSidebarLeftCollapse,
 	LayoutSidebarLeftExpand,
-	List,
+	ListCheck,
 	MoonStars,
-	Plus,
 	Star,
 	Sun,
 } from 'tabler-icons-react';
@@ -107,8 +107,8 @@ const useStyles = createStyles((theme, _params, getRef) => {
 const routes = [
 	{ link: '/', label: 'Home', icon: Home },
 	{ link: 'activities/favorites', label: 'Favorites', icon: Star },
-	{ link: 'activities', label: 'Activities', icon: List },
-	{ link: 'add', label: 'Add', icon: Plus },
+	{ link: 'activities', label: 'Activities', icon: ChartDots },
+	{ link: 'todo', label: 'ToDo', icon: ListCheck },
 ];
 
 export default function VerticalNavbar() {
@@ -141,11 +141,15 @@ export default function VerticalNavbar() {
 	));
 
 	return (
-		<Navbar width={{ xs: !collapsed ? 300 : 80 }} p="md">
+		<Navbar
+			width={{ base: !collapsed ? 270 : 80 }}
+			p="md"
+			style={{ transition: 'width ease-in-out 0.5s' }}>
 			<Navbar.Section grow>
 				<Group
 					className={classes.header}
-					position={collapsed ? 'center' : 'left'}>
+					position={'left'}
+					style={{ paddingLeft: '10px' }}>
 					<ActionIcon
 						onClick={() => setCollapsed(!collapsed)}
 						title={`${collapsed ? 'Extend' : 'Collapse'} sidebar`}>
@@ -159,8 +163,11 @@ export default function VerticalNavbar() {
 				{links}
 			</Navbar.Section>
 
-			<Navbar.Section className={classes.footer}>
-				<Group position={collapsed ? 'center' : 'left'}>
+			<Navbar.Section>
+				<Group
+					className={classes.footer}
+					position={'left'}
+					style={{ paddingLeft: '10px' }}>
 					<ActionIcon
 						onClick={() => toggleColorScheme()}
 						title="Toggle color scheme">
