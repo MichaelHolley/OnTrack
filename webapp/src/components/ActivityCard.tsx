@@ -1,10 +1,18 @@
-import { Card, Title, useMantineColorScheme } from '@mantine/core';
+import {
+	ActionIcon,
+	Card,
+	Group,
+	Title,
+	useMantineColorScheme,
+} from '@mantine/core';
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
+import { CirclePlus } from 'tabler-icons-react';
 import { Activity } from '../../models';
 
 interface Props {
 	activity: Activity;
+	openForm: (id: string) => void;
 }
 
 export const ActivityCard = (props: Props) => {
@@ -33,12 +41,20 @@ export const ActivityCard = (props: Props) => {
 						xaxis: {
 							categories: props.activity.values.map((val) => val.date),
 						},
+						yaxis: {
+							min: 0,
+						},
 					}}
 					type="line"
 					height={260}
 				/>
 			</Card.Section>
-			<Title order={3}>{props.activity.title}</Title>
+			<Group position="apart">
+				<Title order={3}>{props.activity.title}</Title>
+				<ActionIcon onClick={() => props.openForm(props.activity.id)}>
+					<CirclePlus />
+				</ActionIcon>
+			</Group>
 		</Card>
 	);
 };

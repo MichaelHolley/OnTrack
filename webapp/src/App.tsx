@@ -6,19 +6,31 @@ import {
 	Group,
 	LoadingOverlay,
 	MantineProvider,
+	ScrollArea,
 } from '@mantine/core';
 import { useColorScheme, useLocalStorage } from '@mantine/hooks';
+import axios from 'axios';
 import React, { useState } from 'react';
-import GoogleLogin, {
-	GoogleLoginResponse,
-	GoogleLogout,
-} from 'react-google-login';
+import GoogleLogin, { GoogleLogout } from 'react-google-login';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import VerticalNavbar from './components/Navbar';
+import { loginToApi, useUser } from './providers/UserContext';
 import Activities from './views/Activities';
-import Todo from './views/Todo';
 import Favorites from './views/Favorites';
 import Home from './views/Home';
+import Todo from './views/Todo';
+
+axios.interceptors.request.use((config) => {
+	if (!config.headers) {
+		config.headers = {};
+	}
+
+	config.headers.Authorization = `Bearer ${localStorage.getItem(
+		'OnTrackApiToken'
+	)}`;
+
+	return config;
+});
 
 // TODO: Generate new ID and hide within .env-file
 const clientId =
@@ -35,8 +47,9 @@ function App() {
 	const toggleColorScheme = (value?: ColorScheme) =>
 		setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
 
-	const [user, setUser] = useState<GoogleLoginResponse | undefined>();
 	const [loading, setLoading] = useState<boolean>(false);
+
+	const userContext = useUser();
 
 	return (
 		<BrowserRouter>
@@ -53,15 +66,20 @@ function App() {
 									: theme.colors.gray[1],
 							color: theme.colorScheme === 'dark' ? theme.white : theme.black,
 						})}>
-						{user ? (
+						{userContext.googleResponse && userContext.user ? (
 							<Group position="right">
-								<Avatar src={user.profileObj.imageUrl} radius={5} />
+								<Avatar
+									src={userContext.googleResponse.profileObj.imageUrl}
+									radius={5}
+								/>
 								<GoogleLogout
 									clientId={clientId}
 									buttonText="Logout"
 									onLogoutSuccess={() => {
 										console.log('User logged out');
-										setUser(undefined);
+										userContext.setGoogleResponse(undefined);
+										userContext.setUser(undefined);
+										localStorage.clear();
 									}}></GoogleLogout>
 							</Group>
 						) : (
@@ -70,33 +88,39 @@ function App() {
 									clientId={clientId}
 									buttonText="Login with Google"
 									onSuccess={(response) => {
-										console.log(response);
 										if ('profileObj' in response) {
-											setUser(response);
+											userContext.setGoogleResponse(response);
+											loginToApi(response.tokenId).then((res) => {
+												userContext.setUser(res.data.token);
+												localStorage.setItem('OnTrackApiToken', res.data.token);
+											});
 										}
 									}}
 									theme="dark"
 									onFailure={(err) => {
-										console.log(err);
-										setUser(undefined);
-										// TODO: Clear all stored data and reset views
+										console.error(err);
+										userContext.setUser(undefined);
+										userContext.setGoogleResponse(undefined);
+										localStorage.clear();
 									}}
 									cookiePolicy={'single_host_origin'}></GoogleLogin>
 							</Group>
 						)}
-						<LoadingOverlay visible={loading} />
-						<Routes>
-							<Route path="" element={<Home setLoading={setLoading} />} />
-							<Route
-								path="activities"
-								element={<Activities setLoading={setLoading} />}
-							/>
-							<Route
-								path="activities/favorites"
-								element={<Favorites setLoading={setLoading} />}
-							/>
-							<Route path="todo" element={<Todo setLoading={setLoading} />} />
-						</Routes>
+						<ScrollArea>
+							<LoadingOverlay visible={loading} />
+							<Routes>
+								<Route path="" element={<Home setLoading={setLoading} />} />
+								<Route
+									path="activities"
+									element={<Activities setLoading={setLoading} />}
+								/>
+								<Route
+									path="activities/favorites"
+									element={<Favorites setLoading={setLoading} />}
+								/>
+								<Route path="todo" element={<Todo setLoading={setLoading} />} />
+							</Routes>
+						</ScrollArea>
 					</AppShell>
 				</MantineProvider>
 			</ColorSchemeProvider>

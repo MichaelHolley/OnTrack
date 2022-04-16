@@ -7,5 +7,6 @@
 		public ICollection<ActivityValue> Values { get; set; } = new List<ActivityValue>();
 		public bool IsFavorit { get; set; }
 		public DateTime? Deleted { get; set; } = null;
+		public Guid UserId { get; set; }
 	}
 }

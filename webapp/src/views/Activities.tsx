@@ -1,8 +1,11 @@
-import { SimpleGrid, Space, Title } from '@mantine/core';
+import { Button, Group, SimpleGrid, Space, Title } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
+import { CirclePlus } from 'tabler-icons-react';
 import { Activity } from '../../models';
-import { getActivities } from '../providers/ActivitiesService';
 import { ActivityCard } from '../components/ActivityCard';
+import { AddValueDrawer } from '../components/AddValueDrawer';
+import { CreateActivityDrawer } from '../components/CreateActivityDrawer';
+import { getActivities } from '../providers/ActivitiesService';
 
 interface Props {
 	setLoading: (val: boolean) => void;
@@ -11,7 +14,14 @@ interface Props {
 const Activities = (props: Props) => {
 	const [activities, setActivities] = useState<Activity[]>([]);
 
-	useEffect(() => {
+	const [showCreateForm, setShowCreateForm] = useState(false);
+	const [showAddValueForm, setShowAddValueForm] = useState(false);
+
+	const [selectedActivity, setSelectedActivity] = useState<
+		Activity | undefined
+	>(undefined);
+
+	const loadData = () => {
 		props.setLoading(true);
 		getActivities()
 			.then((res) => {
@@ -19,14 +29,29 @@ const Activities = (props: Props) => {
 				props.setLoading(false);
 			})
 			.catch((err) => {
+				console.error(err);
 				props.setLoading(false);
 			});
+	};
+
+	useEffect(() => {
+		loadData();
 	}, []);
 
 	return (
 		<>
-			<Title>Activities</Title>
-			<Space h={40} />
+			<Group position="left">
+				<Title>Activities</Title>
+				<Button
+					variant="light"
+					leftIcon={<CirclePlus />}
+					onClick={() => {
+						setShowCreateForm(true);
+					}}>
+					Create
+				</Button>
+			</Group>
+			<Space h={'lg'} />
 			<SimpleGrid
 				cols={3}
 				spacing={'md'}
@@ -35,9 +60,30 @@ const Activities = (props: Props) => {
 					{ maxWidth: 950, cols: 1 },
 				]}>
 				{activities.map((activity, index) => {
-					return <ActivityCard activity={activity} />;
+					return (
+						<ActivityCard
+							activity={activity}
+							openForm={(id) => {
+								setShowAddValueForm(true);
+								setSelectedActivity(activity);
+							}}
+						/>
+					);
 				})}
 			</SimpleGrid>
+			<CreateActivityDrawer
+				showDrawer={showCreateForm}
+				setShowDrawer={setShowCreateForm}
+				setLoading={props.setLoading}
+				onSuccess={loadData}
+			/>
+			<AddValueDrawer
+				showDrawer={showAddValueForm}
+				setShowDrawer={setShowAddValueForm}
+				setLoading={props.setLoading}
+				selectedActivity={selectedActivity}
+				onSuccess={loadData}
+			/>
 		</>
 	);
 };
