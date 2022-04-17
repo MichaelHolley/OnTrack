@@ -1,8 +1,7 @@
 import axios from 'axios';
 import { Activity, ActivityValue } from './../../models';
 
-// TODO: Move domain to .env
-const URL = 'https://localhost:7008/api/activities';
+const URL = `${process.env.REACT_APP_API_URL}/api/activities`;
 
 export const getActivities = (favorites = false) => {
 	return axios.get<Activity[]>(URL, { params: { favorites: favorites } });

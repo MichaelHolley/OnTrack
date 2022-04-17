@@ -32,10 +32,6 @@ axios.interceptors.request.use((config) => {
 	return config;
 });
 
-// TODO: Generate new ID and hide within .env-file
-const clientId =
-	'612496123801-rqf590fa2gata78m3qvfvqheeabpe93b.apps.googleusercontent.com';
-
 function App() {
 	const preferredColorScheme = useColorScheme();
 
@@ -73,7 +69,7 @@ function App() {
 									radius={5}
 								/>
 								<GoogleLogout
-									clientId={clientId}
+									clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID ?? ''}
 									buttonText="Logout"
 									onLogoutSuccess={() => {
 										console.log('User logged out');
@@ -85,7 +81,7 @@ function App() {
 						) : (
 							<Group position="right">
 								<GoogleLogin
-									clientId={clientId}
+									clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID ?? ''}
 									buttonText="Login with Google"
 									onSuccess={(response) => {
 										if ('profileObj' in response) {
@@ -106,21 +102,19 @@ function App() {
 									cookiePolicy={'single_host_origin'}></GoogleLogin>
 							</Group>
 						)}
-						<ScrollArea>
-							<LoadingOverlay visible={loading} />
-							<Routes>
-								<Route path="" element={<Home setLoading={setLoading} />} />
-								<Route
-									path="activities"
-									element={<Activities setLoading={setLoading} />}
-								/>
-								<Route
-									path="activities/favorites"
-									element={<Favorites setLoading={setLoading} />}
-								/>
-								<Route path="todo" element={<Todo setLoading={setLoading} />} />
-							</Routes>
-						</ScrollArea>
+						<LoadingOverlay visible={loading} />
+						<Routes>
+							<Route path="" element={<Home setLoading={setLoading} />} />
+							<Route
+								path="activities"
+								element={<Activities setLoading={setLoading} />}
+							/>
+							<Route
+								path="activities/favorites"
+								element={<Favorites setLoading={setLoading} />}
+							/>
+							<Route path="todo" element={<Todo setLoading={setLoading} />} />
+						</Routes>
 					</AppShell>
 				</MantineProvider>
 			</ColorSchemeProvider>
