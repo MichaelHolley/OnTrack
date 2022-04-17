@@ -15,9 +15,13 @@ interface Props {
 
 const Context = React.createContext<Props>({
 	user: undefined,
-	setUser: () => {},
+	setUser: () => {
+		return;
+	},
 	googleResponse: undefined,
-	setGoogleResponse: () => {},
+	setGoogleResponse: () => {
+		return;
+	},
 });
 
 export const UserContext: React.FunctionComponent = (props) => {

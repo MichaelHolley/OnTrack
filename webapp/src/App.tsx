@@ -5,8 +5,7 @@ import {
 	ColorSchemeProvider,
 	Group,
 	LoadingOverlay,
-	MantineProvider,
-	ScrollArea,
+	MantineProvider
 } from '@mantine/core';
 import { useColorScheme, useLocalStorage } from '@mantine/hooks';
 import axios from 'axios';

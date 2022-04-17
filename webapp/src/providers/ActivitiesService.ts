@@ -7,8 +7,8 @@ export const getActivities = (favorites = false) => {
 	return axios.get<Activity[]>(URL, { params: { favorites: favorites } });
 };
 
-export const createActivity = (acitivity: any) => {
-	return axios.post(URL + '/create', acitivity);
+export const createActivity = (activity: { title: string }) => {
+	return axios.post(URL + '/create', activity);
 };
 
 export const addValue = (id: string, value: ActivityValue) => {

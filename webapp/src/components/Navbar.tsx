@@ -132,7 +132,7 @@ export default function VerticalNavbar() {
 			})}
 			to={item.link}
 			key={item.label}
-			onClick={(event) => {
+			onClick={() => {
 				setActiveRoute(item.link);
 			}}>
 			<item.icon className={classes.linkIcon} />

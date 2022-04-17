@@ -31,7 +31,7 @@ export const CreateActivityDrawer = (props: Props) => {
 				onSubmit={createForm.onSubmit((values) => {
 					props.setLoading(true);
 					createActivity(values)
-						.then((res) => {
+						.then(() => {
 							props.setShowDrawer(false);
 							props.setLoading(false);
 							props.onSuccess();

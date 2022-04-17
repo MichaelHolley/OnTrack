@@ -59,11 +59,12 @@ const Activities = (props: Props) => {
 					{ maxWidth: 1400, cols: 2 },
 					{ maxWidth: 950, cols: 1 },
 				]}>
-				{activities.map((activity, index) => {
+				{activities.map((activity) => {
 					return (
 						<ActivityCard
+							key={activity.title}
 							activity={activity}
-							openForm={(id) => {
+							openForm={() => {
 								setShowAddValueForm(true);
 								setSelectedActivity(activity);
 							}}

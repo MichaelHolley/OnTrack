@@ -40,7 +40,7 @@ export function AddValueDrawer(props: Props) {
 							date: selectedDate,
 							value: values.value,
 						})
-							.then((res) => {
+							.then(() => {
 								addValueForm.reset();
 								props.setLoading(false);
 								props.setShowDrawer(false);
