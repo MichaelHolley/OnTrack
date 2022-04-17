@@ -3,7 +3,7 @@ import {
 	Card,
 	Group,
 	Title,
-	useMantineColorScheme,
+	useMantineColorScheme
 } from '@mantine/core';
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
@@ -39,7 +39,13 @@ export const ActivityCard = (props: Props) => {
 							mode: isDark ? 'dark' : 'light',
 						},
 						xaxis: {
-							categories: props.activity.values.map((val) => val.date),
+							categories: props.activity.values.map((a) =>
+								new Date(a.date).toLocaleDateString(undefined, {
+									year: 'numeric',
+									month: '2-digit',
+									day: '2-digit',
+								})
+							),
 						},
 						yaxis: {
 							min: 0,
