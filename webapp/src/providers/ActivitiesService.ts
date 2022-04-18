@@ -3,8 +3,8 @@ import { Activity, ActivityValue } from './../../models';
 
 const URL = `${process.env.REACT_APP_API_URL}/api/activities`;
 
-export const getActivities = (favorites = false) => {
-	return axios.get<Activity[]>(URL, { params: { favorites: favorites } });
+export const getActivities = () => {
+	return axios.get<Activity[]>(URL, { params: {} });
 };
 
 export const createActivity = (activity: { title: string }) => {
@@ -16,6 +16,10 @@ export const addValue = (id: string, value: ActivityValue) => {
 		date: formatDate(value.date),
 		value: value.value,
 	});
+};
+
+export const deleteActivity = (id: string) => {
+	return axios.delete(URL + '/' + id + '/delete');
 };
 
 export const formatDate = (date: Date) => {

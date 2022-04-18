@@ -2,13 +2,17 @@ import {
 	ActionIcon,
 	Card,
 	Group,
+	Text,
 	Title,
-	useMantineColorScheme
+	useMantineColorScheme,
+	useMantineTheme,
 } from '@mantine/core';
+import { useModals } from '@mantine/modals';
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
-import { CirclePlus } from 'tabler-icons-react';
+import { CirclePlus, Trash } from 'tabler-icons-react';
 import { Activity } from '../../models';
+import { deleteActivity } from '../providers/ActivitiesService';
 
 interface Props {
 	activity: Activity;
@@ -19,13 +23,29 @@ export const ActivityCard = (props: Props) => {
 	const { colorScheme } = useMantineColorScheme();
 	const isDark = colorScheme === 'dark';
 
+	const modals = useModals();
+	const theme = useMantineTheme();
+
+	const deleteConfirmModal = () =>
+		modals.openConfirmModal({
+			title: 'Delete activity',
+			children: <Text size="sm">This action requires your confirmation.</Text>,
+			labels: { confirm: 'Confirm', cancel: 'Cancel' },
+			onCancel: () => {
+				return;
+			},
+			onConfirm: () => deleteActivity(props.activity.id),
+		});
+
 	return (
 		<Card shadow={'md'} key={props.activity.title}>
 			<Card.Section>
 				<ReactApexChart
 					series={[
 						{
+							name: props.activity.title,
 							data: props.activity.values.map((val) => val.value),
+							color: theme.colors.red[5],
 						},
 					]}
 					options={{
@@ -56,7 +76,12 @@ export const ActivityCard = (props: Props) => {
 				/>
 			</Card.Section>
 			<Group position="apart">
-				<Title order={3}>{props.activity.title}</Title>
+				<Group position="left">
+					<Title order={3}>{props.activity.title}</Title>
+					<ActionIcon onClick={() => deleteConfirmModal()}>
+						<Trash />
+					</ActionIcon>
+				</Group>
 				<ActionIcon onClick={() => props.openForm(props.activity.id)}>
 					<CirclePlus />
 				</ActionIcon>

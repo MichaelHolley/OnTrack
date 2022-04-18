@@ -84,13 +84,8 @@ app.MapPost("/google-signin", ([FromServices] IAuthService authService, UserView
 	}
 }).AllowAnonymous();
 
-app.MapGet("/api/activities", ([FromServices] IActivityService activityService, bool? favorites) =>
+app.MapGet("/api/activities", ([FromServices] IActivityService activityService) =>
 {
-	if (!favorites.HasValue)
-	{
-		favorites = false;
-	}
-
 	return Results.Ok(activityService.GetActivities());
 }).RequireAuthorization();
 

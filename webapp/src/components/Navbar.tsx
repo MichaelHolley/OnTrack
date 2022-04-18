@@ -3,7 +3,7 @@ import {
 	createStyles,
 	Group,
 	Navbar,
-	useMantineColorScheme,
+	useMantineColorScheme
 } from '@mantine/core';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -13,9 +13,7 @@ import {
 	LayoutSidebarLeftCollapse,
 	LayoutSidebarLeftExpand,
 	ListCheck,
-	MoonStars,
-	Star,
-	Sun,
+	MoonStars, Sun
 } from 'tabler-icons-react';
 
 const useStyles = createStyles((theme, _params, getRef) => {
@@ -106,7 +104,6 @@ const useStyles = createStyles((theme, _params, getRef) => {
 
 const routes = [
 	{ link: '/', label: 'Home', icon: Home },
-	{ link: 'activities/favorites', label: 'Favorites', icon: Star },
 	{ link: 'activities', label: 'Activities', icon: ChartDots },
 	{ link: 'todo', label: 'ToDo', icon: ListCheck },
 ];
