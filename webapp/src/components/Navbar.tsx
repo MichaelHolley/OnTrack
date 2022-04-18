@@ -8,13 +8,12 @@ import {
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+	ChartDots,
 	Home,
 	LayoutSidebarLeftCollapse,
 	LayoutSidebarLeftExpand,
-	List,
-	Logout,
+	ListCheck,
 	MoonStars,
-	Plus,
 	Star,
 	Sun,
 } from 'tabler-icons-react';
@@ -105,17 +104,17 @@ const useStyles = createStyles((theme, _params, getRef) => {
 	};
 });
 
-const data = [
+const routes = [
 	{ link: '/', label: 'Home', icon: Home },
-	{ link: 'favorites', label: 'Favorites', icon: Star },
-	{ link: 'activities', label: 'Activities', icon: List },
-	{ link: 'add', label: 'Add', icon: Plus },
+	{ link: 'activities/favorites', label: 'Favorites', icon: Star },
+	{ link: 'activities', label: 'Activities', icon: ChartDots },
+	{ link: 'todo', label: 'ToDo', icon: ListCheck },
 ];
 
 export default function VerticalNavbar() {
 	const { classes, cx } = useStyles();
 	const [activeRoute, setActiveRoute] = useState(
-		window.location.pathname != '/'
+		window.location.pathname !== '/'
 			? window.location.pathname.substring(1)
 			: window.location.pathname
 	);
@@ -125,7 +124,7 @@ export default function VerticalNavbar() {
 	const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 	const isDark = colorScheme === 'dark';
 
-	const links = data.map((item) => (
+	const links = routes.map((item) => (
 		<Link
 			className={cx(classes.link, {
 				[classes.linkActive]:
@@ -133,7 +132,7 @@ export default function VerticalNavbar() {
 			})}
 			to={item.link}
 			key={item.label}
-			onClick={(event) => {
+			onClick={() => {
 				setActiveRoute(item.link);
 			}}>
 			<item.icon className={classes.linkIcon} />
@@ -142,9 +141,15 @@ export default function VerticalNavbar() {
 	));
 
 	return (
-		<Navbar width={{ sm: !collapsed ? 300 : 80 }} p="md">
+		<Navbar
+			width={{ base: !collapsed ? 270 : 80 }}
+			p="md"
+			style={{ transition: 'width ease-in-out 0.5s' }}>
 			<Navbar.Section grow>
-				<Group className={classes.header} position="apart">
+				<Group
+					className={classes.header}
+					position={'left'}
+					style={{ paddingLeft: '10px' }}>
 					<ActionIcon
 						onClick={() => setCollapsed(!collapsed)}
 						title={`${collapsed ? 'Extend' : 'Collapse'} sidebar`}>
@@ -154,29 +159,21 @@ export default function VerticalNavbar() {
 							<LayoutSidebarLeftCollapse size={24} />
 						)}
 					</ActionIcon>
-					{!collapsed && (
-						<ActionIcon
-							onClick={() => toggleColorScheme()}
-							title="Toggle color scheme">
-							{isDark ? <Sun size={24} /> : <MoonStars size={24} />}
-						</ActionIcon>
-					)}
 				</Group>
 				{links}
 			</Navbar.Section>
 
-			<Navbar.Section className={classes.footer}>
-				<a
-					className={classes.link}
-					title="Logout"
-					key={'Logout'}
-					onClick={(event) => {
-						event.preventDefault();
-						console.log('Logout');
-					}}>
-					<Logout className={classes.linkIcon} />
-					{!collapsed && <span className={classes.linkText}>Logout</span>}
-				</a>
+			<Navbar.Section>
+				<Group
+					className={classes.footer}
+					position={'left'}
+					style={{ paddingLeft: '10px' }}>
+					<ActionIcon
+						onClick={() => toggleColorScheme()}
+						title="Toggle color scheme">
+						{isDark ? <Sun size={24} /> : <MoonStars size={24} />}
+					</ActionIcon>
+				</Group>
 			</Navbar.Section>
 		</Navbar>
 	);

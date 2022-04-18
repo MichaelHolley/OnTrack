@@ -1,7 +1,12 @@
 import React from 'react';
+import { Title } from '@mantine/core';
 
-const Home = () => {
-	return <div>Ich bin Home</div>;
+interface Props {
+	setLoading: (val: boolean) => void;
+}
+
+const Home = (props: Props) => {
+	return <Title>Home</Title>;
 };
 
 export default Home;

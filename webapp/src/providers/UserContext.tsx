@@ -1,0 +1,51 @@
+import axios from 'axios';
+import React, { useState } from 'react';
+import { GoogleLoginResponse } from 'react-google-login';
+
+export interface OnTrackUser {
+	token: string;
+}
+
+interface Props {
+	user: OnTrackUser | undefined;
+	setUser: (user: OnTrackUser | undefined) => void;
+	googleResponse: GoogleLoginResponse | undefined;
+	setGoogleResponse: (googleResponse: GoogleLoginResponse | undefined) => void;
+}
+
+const Context = React.createContext<Props>({
+	user: undefined,
+	setUser: () => {
+		return;
+	},
+	googleResponse: undefined,
+	setGoogleResponse: () => {
+		return;
+	},
+});
+
+export const UserContext: React.FunctionComponent = (props) => {
+	const [user, setUser] = useState<OnTrackUser>();
+	const [googleResponse, setGoogleResponse] = useState<GoogleLoginResponse>();
+
+	return (
+		<Context.Provider
+			value={{
+				user,
+				setUser,
+				googleResponse,
+				setGoogleResponse,
+			}}>
+			{props.children}
+		</Context.Provider>
+	);
+};
+
+export const UserContextConsumer = Context.Consumer;
+export const useUser = () => React.useContext(Context);
+
+export const loginToApi = (googleToken: string) => {
+	return axios.post(`${process.env.REACT_APP_API_URL}/google-signin`, {
+		tokenId: googleToken,
+	});
+};
