@@ -1,4 +1,6 @@
 using API.Models;
+using API.Models.Activity;
+using API.Models.Todo;
 using API.Services;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -41,6 +43,7 @@ builder.Services.AddAuthentication(x =>
 builder.Services.AddAuthorization();
 
 builder.Services.AddSingleton<IActivityService, ActivityService>();
+builder.Services.AddSingleton<ITodoService, TodoService>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpContextAccessor();
@@ -113,6 +116,21 @@ app.MapDelete("/api/activities/{id}/delete", ([FromServices] IActivityService ac
 {
 	activityService.Delete(id);
 	return Results.Ok();
+}).RequireAuthorization();
+
+app.MapPost("/api/todos/create", ([FromServices] ITodoService todoService, string todoTitle) =>
+{
+	return Results.Ok(todoService.CreateTodoItem(todoTitle));
+}).RequireAuthorization();
+
+app.MapGet("/api/todos", ([FromServices] ITodoService todoService) =>
+{
+	return Results.Ok(todoService.GetTodoItems());
+}).RequireAuthorization();
+
+app.MapPut("/api/todos/update", ([FromServices] ITodoService todoService, TodoItem todo) =>
+{
+	return Results.Ok(todoService.UpdateTodoItem(todo));
 }).RequireAuthorization();
 
 app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());

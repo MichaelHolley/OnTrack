@@ -25,12 +25,13 @@ const Activities = (props: Props) => {
 		props.setLoading(true);
 		getActivities()
 			.then((res) => {
+				res.data = res.data.filter((a) => !a.deleted);
 				res.data.forEach((a) =>
 					a.values.sort(
 						(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
 					)
 				);
-				setActivities(res.data.filter((a) => !a.deleted));
+				setActivities(res.data);
 				props.setLoading(false);
 			})
 			.catch((err) => {
