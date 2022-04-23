@@ -1,7 +1,7 @@
 import { Button, Group, SimpleGrid, Space, Title } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
 import { CirclePlus } from 'tabler-icons-react';
-import { Activity } from '../../models';
+import { Activity } from '../models';
 import { ActivityCard } from '../components/ActivityCard';
 import { AddValueDrawer } from '../components/AddValueDrawer';
 import { CreateActivityDrawer } from '../components/CreateActivityDrawer';

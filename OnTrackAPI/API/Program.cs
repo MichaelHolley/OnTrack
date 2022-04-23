@@ -118,19 +118,14 @@ app.MapDelete("/api/activities/{id}/delete", ([FromServices] IActivityService ac
 	return Results.Ok();
 }).RequireAuthorization();
 
-app.MapPost("/api/todos/create", ([FromServices] ITodoService todoService, string todoTitle) =>
+app.MapGet("/api/todos", ([FromServices] ITodoService todoService, TodoState? state) =>
 {
-	return Results.Ok(todoService.CreateTodoItem(todoTitle));
+	return Results.Ok(todoService.GetTodoItems(state));
 }).RequireAuthorization();
 
-app.MapGet("/api/todos", ([FromServices] ITodoService todoService) =>
+app.MapPost("/api/todos/createorupdate", ([FromServices] ITodoService todoService, TodoItem todo) =>
 {
-	return Results.Ok(todoService.GetTodoItems());
-}).RequireAuthorization();
-
-app.MapPut("/api/todos/update", ([FromServices] ITodoService todoService, TodoItem todo) =>
-{
-	return Results.Ok(todoService.UpdateTodoItem(todo));
+	return Results.Ok(todoService.CreateOrUpdate(todo));
 }).RequireAuthorization();
 
 app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());

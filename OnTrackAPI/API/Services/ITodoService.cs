@@ -7,9 +7,8 @@ namespace API.Services
 {
 	public interface ITodoService
 	{
-		public ICollection<TodoItem> GetTodoItems();
-		public TodoItem CreateTodoItem(string title);
-		public TodoItem? UpdateTodoItem(TodoItem item);
+		public ICollection<TodoItem> GetTodoItems(TodoState? state);
+		public TodoItem CreateOrUpdate(TodoItem item);
 	}
 
 	public class TodoService : ITodoService
@@ -32,25 +31,24 @@ namespace API.Services
 			this.httpContextAccessor = httpContextAccessor;
 		}
 
-		public TodoItem CreateTodoItem(string title)
-		{
-			TodoItem todo = new TodoItem();
-			todo.Id = Guid.NewGuid();
-			todo.Title = title;
-			todo.Created = DateTime.UtcNow;
-			todo.UserId = httpContextAccessor.HttpContext.GetUserId();
-
-			todoCollection.InsertOne(todo);
-			return todo;
-		}
-
-		public ICollection<TodoItem> GetTodoItems()
+		public ICollection<TodoItem> GetTodoItems(TodoState? state)
 		{
 			var userId = httpContextAccessor.HttpContext.GetUserId();
-			return todoCollection.Find(t => t.UserId.Equals(userId)).ToList();
+
+			FilterDefinition<TodoItem> filter;
+			if (state.HasValue)
+			{
+				filter = filterBuilder.Where(t => t.State.Equals(state.Value) && t.UserId.Equals(userId));
+			}
+			else
+			{
+				filter = filterBuilder.Where(t => t.UserId.Equals(userId));
+			}
+
+			return todoCollection.Find(filter).ToList();
 		}
 
-		public TodoItem? UpdateTodoItem(TodoItem item)
+		public TodoItem CreateOrUpdate(TodoItem item)
 		{
 			var userId = httpContextAccessor.HttpContext.GetUserId();
 			var filter = filterBuilder.Where(t => t.Id.Equals(item.Id) && t.UserId.Equals(userId));
@@ -64,9 +62,19 @@ namespace API.Services
 				existing.Modified = DateTime.UtcNow;
 
 				todoCollection.ReplaceOne(filter, existing);
+				return existing;
 			}
+			else
+			{
+				TodoItem todo = new TodoItem();
+				todo.Id = Guid.NewGuid();
+				todo.Title = item.Title;
+				todo.Created = DateTime.UtcNow;
+				todo.UserId = userId;
 
-			return existing;
+				todoCollection.InsertOne(todo);
+				return todo;
+			}
 		}
 	}
 }

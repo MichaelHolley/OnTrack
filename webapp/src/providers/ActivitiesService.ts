@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Activity, ActivityValue } from './../../models';
+import { Activity, ActivityValue } from '../models';
 
 const URL = `${process.env.REACT_APP_API_URL}/api/activities`;
 
