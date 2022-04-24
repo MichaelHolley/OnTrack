@@ -15,3 +15,7 @@ export const createOrUpdateTodo = (todo: {
 }) => {
 	return axios.post<TodoItem>(URL + '/createorupdate', todo);
 };
+
+export const deleteTodo = (id: string) => {
+	return axios.delete(URL + '/delete', { params: { id: id } });
+};

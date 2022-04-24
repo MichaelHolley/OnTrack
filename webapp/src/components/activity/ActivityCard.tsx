@@ -11,8 +11,8 @@ import { useModals } from '@mantine/modals';
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { CirclePlus, Trash } from 'tabler-icons-react';
-import { Activity } from '../models';
-import { deleteActivity } from '../providers/ActivitiesService';
+import { Activity } from '../../models';
+import { deleteActivity } from '../../providers/ActivitiesService';
 
 interface Props {
 	activity: Activity;

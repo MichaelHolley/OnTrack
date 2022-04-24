@@ -2,9 +2,9 @@ import { Button, Group, SimpleGrid, Space, Title } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
 import { CirclePlus } from 'tabler-icons-react';
 import { Activity } from '../models';
-import { ActivityCard } from '../components/ActivityCard';
-import { AddValueDrawer } from '../components/AddValueDrawer';
-import { CreateActivityDrawer } from '../components/CreateActivityDrawer';
+import { ActivityCard } from '../components/activity/ActivityCard';
+import { AddValueDrawer } from '../components/activity/AddValueDrawer';
+import { CreateActivityDrawer } from '../components/activity/CreateActivityDrawer';
 import { getActivities } from '../providers/ActivitiesService';
 
 interface Props {

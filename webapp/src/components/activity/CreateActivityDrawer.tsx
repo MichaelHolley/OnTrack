@@ -1,7 +1,7 @@
 import { Button, Drawer, Group, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import React from 'react';
-import { createActivity } from '../providers/ActivitiesService';
+import { createActivity } from '../../providers/ActivitiesService';
 
 interface Props {
 	showDrawer: boolean;

@@ -128,6 +128,12 @@ app.MapPost("/api/todos/createorupdate", ([FromServices] ITodoService todoServic
 	return Results.Ok(todoService.CreateOrUpdate(todo));
 }).RequireAuthorization();
 
+app.MapDelete("/api/todos/delete", ([FromServices] ITodoService todoService, Guid id) =>
+{
+	todoService.Delete(id);
+	return Results.Ok();
+}).RequireAuthorization();
+
 app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 app.UseAuthentication();

@@ -1,18 +1,11 @@
-import {
-	ActionIcon, Group, Paper,
-	ScrollArea,
-	Space,
-	Text,
-	TextInput,
-	Title
-} from '@mantine/core';
+import { Group, Space, Title } from '@mantine/core';
 import { useListState } from '@mantine/hooks';
-import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
-import React, { useEffect, useState } from 'react';
-import { Check, ClearAll, Plus, Run } from 'tabler-icons-react';
-import { TitleDivider } from '../components/TitleDivider';
+import React, { useEffect } from 'react';
+import { Check, ClearAll, Run } from 'tabler-icons-react';
+import { TitleDivider } from '../components/common/TitleDivider';
+import TodoList from '../components/todo/TodoList';
 import { TodoItem, TodoState } from '../models';
-import { createOrUpdateTodo, getTodos } from '../providers/TodosService';
+import { getTodos } from '../providers/TodosService';
 
 interface Props {
 	setLoading: (val: boolean) => void;
@@ -65,6 +58,7 @@ const Todo = (props: Props) => {
 				height={210}
 				state={TodoState.Open}
 				listHandler={openHandlers}
+				nextStateHandler={inProgressHandlers}
 			/>
 			<Space h={'lg'} />
 			<TitleDivider title="In Progress" icon={<Run />} />
@@ -73,6 +67,7 @@ const Todo = (props: Props) => {
 				height={210}
 				state={TodoState.InProgress}
 				listHandler={inProgressHandlers}
+				nextStateHandler={completeHandlers}
 			/>
 			<Space h={'lg'} />
 			<TitleDivider title="Complete" icon={<Check />} />
@@ -84,53 +79,6 @@ const Todo = (props: Props) => {
 			/>
 		</>
 	);
-};
-
-export const TodoList = (props: {
-	items: TodoItem[];
-	state: TodoState;
-	height: number;
-	listHandler: UseListStateHandler<TodoItem>;
-}) => {
-	const [addInput, setAddInput] = useState('');
-
-	return (
-		<Paper>
-			<ScrollArea style={{ height: props.height }}>
-				{props.items.map((item) => TodoListItem({ todoItem: item }))}
-			</ScrollArea>
-			<TextInput
-				placeholder="Enter a task-description"
-				required
-				value={addInput}
-				onChange={(event) => setAddInput(event.currentTarget.value)}
-				rightSection={
-					<ActionIcon
-						onClick={() => {
-							if (!!addInput && addInput !== '') {
-								createOrUpdateTodo({
-									title: addInput,
-									state: props.state,
-								}).then((res) => {
-									setAddInput('');
-									props.listHandler.append(res.data);
-								});
-							}
-						}}
-						title="Add todo">
-						<Plus />
-					</ActionIcon>
-				}
-				rightSectionWidth={50}
-				rightSectionProps={{
-					style: { paddingRight: 4, justifyContent: 'end' },
-				}}></TextInput>
-		</Paper>
-	);
-};
-
-export const TodoListItem = (props: { todoItem: TodoItem }) => {
-	return <Text style={{ padding: 8 }}>{props.todoItem.title}</Text>;
 };
 
 export default Todo;

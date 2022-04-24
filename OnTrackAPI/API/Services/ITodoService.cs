@@ -9,6 +9,7 @@ namespace API.Services
 	{
 		public ICollection<TodoItem> GetTodoItems(TodoState? state);
 		public TodoItem CreateOrUpdate(TodoItem item);
+		public void Delete(Guid id);
 	}
 
 	public class TodoService : ITodoService
@@ -74,6 +75,20 @@ namespace API.Services
 
 				todoCollection.InsertOne(todo);
 				return todo;
+			}
+		}
+
+		public void Delete(Guid id)
+		{
+			var userId = httpContextAccessor.HttpContext.GetUserId();
+			var filter = filterBuilder.Where(t => t.Id.Equals(id) && t.UserId.Equals(userId));
+
+			var existing = todoCollection.Find(filter).SingleOrDefault();
+
+			if (existing != null)
+			{
+				existing.Deleted = DateTime.UtcNow;
+				todoCollection.ReplaceOne(filter, existing);
 			}
 		}
 	}
