@@ -1,11 +1,7 @@
-import React from 'react';
 import { Title } from '@mantine/core';
+import React from 'react';
 
-interface Props {
-	setLoading: (val: boolean) => void;
-}
-
-const Home = (props: Props) => {
+const Home = () => {
 	return <Title>Home</Title>;
 };
 
