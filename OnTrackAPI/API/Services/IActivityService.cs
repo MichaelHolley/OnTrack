@@ -1,4 +1,5 @@
 ﻿using API.Models;
+using API.Models.Activity;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -29,8 +30,7 @@ namespace API.Services
 			var mongoDatabase = mongoClient.GetDatabase(
 				onTrackDatabaseSettings.Value.DatabaseName);
 
-			activityCollection = mongoDatabase.GetCollection<Activity>(
-				onTrackDatabaseSettings.Value.ActivitiesCollectionName);
+			activityCollection = mongoDatabase.GetCollection<Activity>(onTrackDatabaseSettings.Value.ActivitiesCollectionName);
 
 			this.httpContextAccessor = httpContextAccessor;
 		}
@@ -78,7 +78,7 @@ namespace API.Services
 			return activityCollection.Find(a => a.UserId.Equals(userId)).ToList();
 		}
 
-		public Activity GetActivityById(Guid id)
+		public Activity? GetActivityById(Guid id)
 		{
 			var userId = httpContextAccessor.HttpContext.GetUserId();
 			var filter = filterBuilder.Where(a => a.Id.Equals(id) && a.UserId.Equals(userId));

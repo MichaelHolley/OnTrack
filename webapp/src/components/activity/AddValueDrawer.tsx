@@ -3,7 +3,7 @@ import { DatePicker } from '@mantine/dates';
 import { useForm } from '@mantine/hooks';
 import React, { useState } from 'react';
 import { Activity } from '../../models';
-import { addValue } from '../providers/ActivitiesService';
+import { addValue } from '../../providers/ActivitiesService';
 
 interface Props {
 	showDrawer: boolean;

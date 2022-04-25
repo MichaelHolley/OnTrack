@@ -13,7 +13,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import GoogleLogin, { GoogleLogout } from 'react-google-login';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import VerticalNavbar from './components/Navbar';
+import VerticalNavbar from './components/common/Navbar';
 import { loginToApi, useUser } from './providers/UserContext';
 import Activities from './views/Activities';
 import Home from './views/Home';

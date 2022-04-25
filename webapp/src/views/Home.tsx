@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Title } from '@mantine/core';
 
 interface Props {
@@ -6,6 +6,10 @@ interface Props {
 }
 
 const Home = (props: Props) => {
+	useEffect(() => {
+		props.setLoading(false);
+	}, []);
+
 	return <Title>Home</Title>;
 };
 
