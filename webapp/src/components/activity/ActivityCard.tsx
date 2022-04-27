@@ -17,6 +17,7 @@ import { deleteActivity } from '../../providers/ActivitiesService';
 interface Props {
 	activity: Activity;
 	openForm: (id: string) => void;
+	onSuccess: () => void;
 }
 
 export const ActivityCard = (props: Props) => {
@@ -34,7 +35,9 @@ export const ActivityCard = (props: Props) => {
 			onCancel: () => {
 				return;
 			},
-			onConfirm: () => deleteActivity(props.activity.id),
+			onConfirm: () => {
+				deleteActivity(props.activity.id).then(() => props.onSuccess());
+			},
 		});
 
 	return (

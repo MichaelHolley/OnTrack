@@ -74,6 +74,7 @@ const Activities = (props: Props) => {
 								setShowAddValueForm(true);
 								setSelectedActivity(activity);
 							}}
+							onSuccess={loadData}
 						/>
 					);
 				})}
