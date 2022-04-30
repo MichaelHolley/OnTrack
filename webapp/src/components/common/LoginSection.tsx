@@ -22,7 +22,7 @@ const LoginSection = () => {
 		if ('profileObj' in response) {
 			userContext.setGoogleResponse(response);
 			loginToApi(response.tokenId).then((res) => {
-				userContext.setUser({ token: res.data.token });
+				userContext.setUser(res.data);
 			});
 		}
 	};

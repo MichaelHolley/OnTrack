@@ -1,3 +1,4 @@
+using API;
 using API.Models;
 using API.Models.Activity;
 using API.Models.Todo;
@@ -9,7 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,37 +54,51 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-app.MapPost("/google-signin", ([FromServices] IAuthService authService, UserView userView) =>
+app.MapPost("/google-signin", ([FromServices] IAuthService authService, [FromServices] IUserService userService, UserView userView) =>
 {
 	try
 	{
 		var payload = GoogleJsonWebSignature.ValidateAsync(userView.TokenId, new GoogleJsonWebSignature.ValidationSettings()).Result;
 		var user = authService.Authenticate(payload);
 
-		var claims = new[]
-		{
-			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-			new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-		};
+		var secret = builder.Configuration["Auth:JwtSecret"];
+		var token = authService.GenerateAccessToken(secret, user);
+		var refreshToken = authService.GenerateRefreshToken();
 
-		var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Auth:JwtSecret"]));
-		var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-		var token = new JwtSecurityToken("OnTrack",
-		  String.Empty,
-		  claims,
-		  expires: DateTime.Now.AddMinutes(120),
-		  signingCredentials: creds);
+		userService.UpdateUserRefreshToken(user.Id, refreshToken);
 
 		return Results.Ok(new
 		{
-			token = new JwtSecurityTokenHandler().WriteToken(token)
+			Token = new JwtSecurityTokenHandler().WriteToken(token),
+			RefreshToken = refreshToken
 		});
 	}
 	catch (Exception ex)
 	{
 		return Results.BadRequest(ex.Message);
 	}
+}).AllowAnonymous();
+
+app.MapPost("/refresh-token", ([FromServices] IAuthService authService, [FromServices] IUserService userService, HttpContext httpContext, UserView userView) =>
+{
+	var user = userService.GetUserById(httpContext.GetUserId());
+
+	if (userView.TokenId == null || user == null || user.RefreshToken != userView.RefreshToken)
+	{
+		return Results.BadRequest("Invalid client request");
+	}
+
+	var secret = builder.Configuration["Auth:JwtSecret"];
+	var newAccessToken = authService.GenerateAccessToken(secret, user);
+	var newRefreshToken = authService.GenerateRefreshToken();
+
+	userService.UpdateUserRefreshToken(user.Id, newRefreshToken);
+
+	return Results.Ok(new
+	{
+		Token = new JwtSecurityTokenHandler().WriteToken(newAccessToken),
+		RefreshToken = newRefreshToken
+	});
 }).AllowAnonymous();
 
 app.MapGet("/api/activities", ([FromServices] IActivityService activityService) =>

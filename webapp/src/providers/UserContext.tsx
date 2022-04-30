@@ -4,6 +4,7 @@ import { GoogleLoginResponse } from 'react-google-login';
 
 export interface OnTrackUser {
 	token: string;
+	refreshToken: string;
 }
 
 interface Props {
@@ -74,7 +75,10 @@ export const UserContextConsumer = Context.Consumer;
 export const useUser = () => React.useContext(Context);
 
 export const loginToApi = (googleToken: string) => {
-	return axios.post(`${process.env.REACT_APP_API_URL}/google-signin`, {
-		tokenId: googleToken,
-	});
+	return axios.post<OnTrackUser>(
+		`${process.env.REACT_APP_API_URL}/google-signin`,
+		{
+			tokenId: googleToken,
+		}
+	);
 };

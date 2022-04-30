@@ -8,10 +8,13 @@
 		public string Email { get; set; }
 		public string OAuthSubject { get; set; }
 		public string OAuthIssuer { get; set; }
+		public string RefreshToken { get; set; }
+		public DateTime LastRefresh { get; set; }
 	}
 
 	public class UserView
 	{
 		public string TokenId { get; set; }
+		public string? RefreshToken { get; set; }
 	}
 }

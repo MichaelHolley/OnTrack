@@ -1,11 +1,18 @@
 ﻿using API.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
 
 namespace API.Services
 {
 	public interface IAuthService
 	{
-		User Authenticate(Payload payload);
+		public User Authenticate(Payload payload);
+		public JwtSecurityToken GenerateAccessToken(string secret, User user);
+		public string GenerateRefreshToken();
 	}
 
 	public class AuthService : IAuthService
@@ -19,7 +26,36 @@ namespace API.Services
 
 		public User Authenticate(Payload payload)
 		{
-			return this.FindUserOrAdd(payload);
+			return FindUserOrAdd(payload);
+		}
+
+		public JwtSecurityToken GenerateAccessToken(string secret, User user)
+		{
+			var claims = new List<Claim>() {
+				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+				new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString())
+			};
+
+			var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret));
+			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+			var token = new JwtSecurityToken("OnTrack",
+			  string.Empty,
+			  claims,
+			  expires: DateTime.Now.AddSeconds(10),
+			  signingCredentials: creds);
+
+			return token;
+		}
+
+		public string GenerateRefreshToken()
+		{
+			var randomNumber = new byte[32];
+			using (var rng = RandomNumberGenerator.Create())
+			{
+				rng.GetBytes(randomNumber);
+				return Convert.ToBase64String(randomNumber);
+			}
 		}
 
 		private User FindUserOrAdd(Payload payload)
