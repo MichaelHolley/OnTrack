@@ -27,6 +27,10 @@ const LoginSection = () => {
 		}
 	};
 
+	if (process.env.REACT_APP_GOOGLE_CLIENT_ID === undefined) {
+		return <></>;
+	}
+
 	return (
 		<Group position="right">
 			{userContext.googleResponse && userContext.user ? (
@@ -36,13 +40,13 @@ const LoginSection = () => {
 						radius={5}
 					/>
 					<GoogleLogout
-						clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID ?? ''}
+						clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
 						buttonText="Logout"
 						onLogoutSuccess={clearStoredData}></GoogleLogout>
 				</>
 			) : (
 				<GoogleLogin
-					clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID ?? ''}
+					clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
 					buttonText="Login with Google"
 					onSuccess={(response) => login(response)}
 					theme="dark"
