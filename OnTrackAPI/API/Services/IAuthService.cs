@@ -13,6 +13,7 @@ namespace API.Services
 		public User Authenticate(Payload payload);
 		public JwtSecurityToken GenerateAccessToken(string secret, string issuer, User user);
 		public string GenerateRefreshToken();
+		public string GenerateAndSetUserRefreshToken(User user);
 		public ClaimsPrincipal GetPrincipalFromExpiredToken(string token, string secret, string issuer);
 
 	}
@@ -48,6 +49,15 @@ namespace API.Services
 			  signingCredentials: creds);
 
 			return token;
+		}
+
+		public string GenerateAndSetUserRefreshToken(User user)
+		{
+			var refreshToken = GenerateRefreshToken();
+
+			userService.UpdateUserRefreshToken(user.Id, refreshToken);
+
+			return refreshToken;
 		}
 
 		public string GenerateRefreshToken()

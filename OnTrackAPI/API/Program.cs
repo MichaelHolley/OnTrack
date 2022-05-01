@@ -59,7 +59,7 @@ app.UseHttpsRedirection();
 /// <summary>
 /// Login using Google-Token
 /// </summary>
-app.MapPost("/google-signin", ([FromServices] IAuthService authService, [FromServices] IUserService userService, UserView userView) =>
+app.MapPost("/google-signin", ([FromServices] IAuthService authService, UserView userView) =>
 {
 	try
 	{
@@ -67,9 +67,7 @@ app.MapPost("/google-signin", ([FromServices] IAuthService authService, [FromSer
 		var user = authService.Authenticate(payload);
 
 		var token = authService.GenerateAccessToken(builder.Configuration["Auth:JwtSecret"], builder.Configuration["Auth:ValidIssuer"], user);
-		var refreshToken = authService.GenerateRefreshToken();
-
-		userService.UpdateUserRefreshToken(user.Id, refreshToken);
+		var refreshToken = authService.GenerateAndSetUserRefreshToken(user);
 
 		return Results.Ok(new
 		{
@@ -87,7 +85,7 @@ app.MapPost("/google-signin", ([FromServices] IAuthService authService, [FromSer
 /// <summary>
 /// Refresh OnTrackAPI-Token - requiring previous API-Token + Refresh-Token
 /// </summary>
-app.MapPost("/refresh-token", ([FromServices] IAuthService authService, [FromServices] IUserService userService, HttpContext httpContext, UserView userView) =>
+app.MapPost("/refresh-token", ([FromServices] IAuthService authService, [FromServices] IUserService userService, UserView userView) =>
 {
 	try
 	{
