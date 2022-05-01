@@ -11,8 +11,10 @@ namespace API.Services
 	public interface IAuthService
 	{
 		public User Authenticate(Payload payload);
-		public JwtSecurityToken GenerateAccessToken(string secret, User user);
+		public JwtSecurityToken GenerateAccessToken(string secret, string issuer, User user);
 		public string GenerateRefreshToken();
+		public ClaimsPrincipal GetPrincipalFromExpiredToken(string token, string secret, string issuer);
+
 	}
 
 	public class AuthService : IAuthService
@@ -29,7 +31,7 @@ namespace API.Services
 			return FindUserOrAdd(payload);
 		}
 
-		public JwtSecurityToken GenerateAccessToken(string secret, User user)
+		public JwtSecurityToken GenerateAccessToken(string secret, string issuer, User user)
 		{
 			var claims = new List<Claim>() {
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -39,10 +41,10 @@ namespace API.Services
 			var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret));
 			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-			var token = new JwtSecurityToken("OnTrack",
+			var token = new JwtSecurityToken(issuer,
 			  string.Empty,
 			  claims,
-			  expires: DateTime.Now.AddSeconds(10),
+			  expires: DateTime.Now.AddDays(7),
 			  signingCredentials: creds);
 
 			return token;
@@ -56,6 +58,31 @@ namespace API.Services
 				rng.GetBytes(randomNumber);
 				return Convert.ToBase64String(randomNumber);
 			}
+		}
+
+		public ClaimsPrincipal GetPrincipalFromExpiredToken(string token, string secret, string issuer)
+		{
+			var tokenValidationParameters = new TokenValidationParameters
+			{
+				ValidateAudience = false,
+				ValidateIssuer = true,
+				ValidIssuer = issuer,
+				ValidateIssuerSigningKey = true,
+				IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret)),
+				ValidateLifetime = false,
+			};
+
+			var tokenHandler = new JwtSecurityTokenHandler();
+			SecurityToken securityToken;
+			var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
+			var jwtSecurityToken = securityToken as JwtSecurityToken;
+
+			if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+			{
+				throw new SecurityTokenException("Invalid token");
+			}
+
+			return principal;
 		}
 
 		private User FindUserOrAdd(Payload payload)
