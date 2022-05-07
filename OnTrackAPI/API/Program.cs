@@ -33,10 +33,12 @@ builder.Services.AddAuthentication(x =>
 
 		cfg.TokenValidationParameters = new TokenValidationParameters()
 		{
+			ValidateAudience = false,
+			ValidateIssuer = true,
+			ValidIssuer = builder.Configuration["Auth:ValidIssuer"],
 			ValidateIssuerSigningKey = true,
 			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Auth:JwtSecret"])),
-			ValidateIssuer = false,
-			ValidateAudience = false,
+			ValidateLifetime = true
 		};
 	});
 
@@ -54,6 +56,9 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+/// <summary>
+/// Login using Google-Token
+/// </summary>
 app.MapPost("/google-signin", ([FromServices] IAuthService authService, UserView userView) =>
 {
 	try
@@ -61,24 +66,48 @@ app.MapPost("/google-signin", ([FromServices] IAuthService authService, UserView
 		var payload = GoogleJsonWebSignature.ValidateAsync(userView.TokenId, new GoogleJsonWebSignature.ValidationSettings()).Result;
 		var user = authService.Authenticate(payload);
 
-		var claims = new[]
-		{
-			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-			new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-		};
-
-		var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Auth:JwtSecret"]));
-		var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-		var token = new JwtSecurityToken("OnTrack",
-		  String.Empty,
-		  claims,
-		  expires: DateTime.Now.AddMinutes(120),
-		  signingCredentials: creds);
+		var token = authService.GenerateAccessToken(builder.Configuration["Auth:JwtSecret"], builder.Configuration["Auth:ValidIssuer"], user);
+		var refreshToken = authService.GenerateAndSetUserRefreshToken(user);
 
 		return Results.Ok(new
 		{
-			token = new JwtSecurityTokenHandler().WriteToken(token)
+			Token = new JwtSecurityTokenHandler().WriteToken(token),
+			RefreshToken = refreshToken
+		});
+	}
+	catch (Exception ex)
+	{
+		return Results.BadRequest(ex.Message);
+	}
+}).AllowAnonymous();
+
+
+/// <summary>
+/// Refresh OnTrackAPI-Token - requiring previous API-Token + Refresh-Token
+/// </summary>
+app.MapPost("/refresh-token", ([FromServices] IAuthService authService, [FromServices] IUserService userService, UserView userView) =>
+{
+	try
+	{
+		var principal = authService.GetPrincipalFromExpiredToken(userView.TokenId, builder.Configuration["Auth:JwtSecret"], builder.Configuration["Auth:ValidIssuer"]);
+
+		var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+		var user = userService.GetUserById(Guid.Parse(userId));
+
+		if (userView.TokenId == null || user == null || user.RefreshToken != userView.RefreshToken)
+		{
+			return Results.BadRequest("Invalid client-request");
+		}
+
+		var newAccessToken = authService.GenerateAccessToken(builder.Configuration["Auth:JwtSecret"], builder.Configuration["Auth:ValidIssuer"], user);
+		var newRefreshToken = authService.GenerateRefreshToken();
+
+		userService.UpdateUserRefreshToken(user.Id, newRefreshToken);
+
+		return Results.Ok(new
+		{
+			Token = new JwtSecurityTokenHandler().WriteToken(newAccessToken),
+			RefreshToken = newRefreshToken
 		});
 	}
 	catch (Exception ex)

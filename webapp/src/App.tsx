@@ -1,32 +1,46 @@
 import {
 	AppShell,
-	Avatar,
 	ColorScheme,
 	ColorSchemeProvider,
-	Group,
 	LoadingOverlay,
 	MantineProvider,
 } from '@mantine/core';
 import { useColorScheme, useLocalStorage } from '@mantine/hooks';
 import { ModalsProvider } from '@mantine/modals';
 import axios from 'axios';
+import jwtDecode, { JwtPayload } from 'jwt-decode';
 import React, { useState } from 'react';
-import GoogleLogin, { GoogleLogout } from 'react-google-login';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import LoginSection from './components/common/LoginSection';
 import VerticalNavbar from './components/common/Navbar';
-import { loginToApi, useUser } from './providers/UserContext';
+import {
+	OnTrackUser,
+	refreshApiToken,
+	USER_KEY,
+	useUser,
+} from './providers/UserContext';
 import Activities from './views/Activities';
 import Home from './views/Home';
 import Todo from './views/Todo';
 
-axios.interceptors.request.use((config) => {
+axios.interceptors.request.use(async (config) => {
 	if (!config.headers) {
 		config.headers = {};
 	}
 
-	config.headers.Authorization = `Bearer ${localStorage.getItem(
-		'OnTrackApiToken'
-	)}`;
+	const storedUser = localStorage.getItem(USER_KEY);
+	if (storedUser) {
+		const parsedUser = JSON.parse(storedUser) as OnTrackUser;
+
+		if (parsedUser !== undefined && !config.url?.endsWith('refresh-token')) {
+			const decoded = jwtDecode(parsedUser?.token) as JwtPayload;
+			if (decoded.exp !== undefined && Date.now() >= decoded.exp * 1000) {
+				await refreshApiToken(parsedUser);
+			}
+		}
+
+		config.headers.Authorization = `Bearer ${parsedUser.token}`;
+	}
 
 	return config;
 });
@@ -62,50 +76,9 @@ function App() {
 										: theme.colors.gray[1],
 								color: theme.colorScheme === 'dark' ? theme.white : theme.black,
 							})}>
-							{userContext.googleResponse && userContext.user ? (
-								<Group position="right">
-									<Avatar
-										src={userContext.googleResponse.profileObj.imageUrl}
-										radius={5}
-									/>
-									<GoogleLogout
-										clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID ?? ''}
-										buttonText="Logout"
-										onLogoutSuccess={() => {
-											console.log('User logged out');
-											userContext.setGoogleResponse(undefined);
-											userContext.setUser(undefined);
-											localStorage.clear();
-										}}></GoogleLogout>
-								</Group>
-							) : (
-								<Group position="right">
-									<GoogleLogin
-										clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID ?? ''}
-										buttonText="Login with Google"
-										onSuccess={(response) => {
-											if ('profileObj' in response) {
-												userContext.setGoogleResponse(response);
-												loginToApi(response.tokenId).then((res) => {
-													userContext.setUser(res.data.token);
-													localStorage.setItem(
-														'OnTrackApiToken',
-														res.data.token
-													);
-												});
-											}
-										}}
-										theme="dark"
-										onFailure={(err) => {
-											console.error(err);
-											userContext.setUser(undefined);
-											userContext.setGoogleResponse(undefined);
-											localStorage.clear();
-										}}
-										cookiePolicy={'single_host_origin'}></GoogleLogin>
-								</Group>
-							)}
 							<LoadingOverlay visible={loading} />
+
+							<LoginSection />
 
 							{userContext.user && userContext.googleResponse && (
 								<Routes>
