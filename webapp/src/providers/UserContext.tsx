@@ -26,7 +26,7 @@ const Context = React.createContext<Props>({
 });
 
 export const USER_KEY = 'OnTrackUser';
-const GOOGLE_RESPONSE_KEY = 'GoogleResponse';
+export const GOOGLE_RESPONSE_KEY = 'GoogleResponse';
 
 export const UserContext: React.FunctionComponent = (props) => {
 	const [user, setUser] = useState<OnTrackUser>();
@@ -81,4 +81,16 @@ export const loginToApi = (googleToken: string) => {
 			tokenId: googleToken,
 		}
 	);
+};
+
+export const refreshApiToken = async (user: OnTrackUser) => {
+	axios
+		.post<OnTrackUser>(`${process.env.REACT_APP_API_URL}/refresh-token`, {
+			tokenId: user.token,
+			refreshToken: user.refreshToken,
+		})
+		.then((res) => {
+			localStorage.setItem(USER_KEY, JSON.stringify(res.data));
+		})
+		.catch(console.error);
 };
