@@ -3,9 +3,11 @@ import React from 'react';
 import GoogleLogin, {
 	GoogleLoginResponse,
 	GoogleLoginResponseOffline,
-	GoogleLogout,
+	GoogleLogout
 } from 'react-google-login';
-import { loginToApi, useUser } from '../../providers/UserContext';
+import {
+	removeLocalUserData, loginToApi, useUser
+} from '../../providers/UserContext';
 
 const LoginSection = () => {
 	const userContext = useUser();
@@ -13,7 +15,7 @@ const LoginSection = () => {
 	const clearStoredData = () => {
 		userContext.setGoogleResponse(undefined);
 		userContext.setUser(undefined);
-		localStorage.clear();
+		removeLocalUserData();
 	};
 
 	const login = (

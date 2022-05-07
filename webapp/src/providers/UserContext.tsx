@@ -92,5 +92,13 @@ export const refreshApiToken = async (user: OnTrackUser) => {
 		.then((res) => {
 			localStorage.setItem(USER_KEY, JSON.stringify(res.data));
 		})
-		.catch(console.error);
+		.catch((err) => {
+			console.error(err);
+			removeLocalUserData();
+		});
+};
+
+export const removeLocalUserData = () => {
+	localStorage.removeItem(USER_KEY);
+	localStorage.removeItem(GOOGLE_RESPONSE_KEY);
 };
