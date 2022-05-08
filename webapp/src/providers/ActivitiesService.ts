@@ -29,3 +29,16 @@ export const formatDate = (date: Date) => {
 
 	return date.getFullYear() + '-' + month + '-' + day;
 };
+
+export const getSortedActivities = (activities: Activity[]) => {
+	return activities.sort((a, b) => {
+		return (
+			(b.modified !== undefined && b.modified !== null
+				? new Date(b.modified).getTime()
+				: new Date(b.created).getTime()) -
+			(a.modified !== undefined && a.modified !== null
+				? new Date(a.modified).getTime()
+				: new Date(a.created).getTime())
+		);
+	});
+};

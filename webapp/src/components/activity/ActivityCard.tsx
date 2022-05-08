@@ -80,12 +80,6 @@ export const ActivityCard = (props: Props) => {
 						},
 						fill: {
 							type: 'gradient',
-							gradient: {
-								shadeIntensity: 0.1,
-								opacityFrom: 0.9,
-								opacityTo: 0.0,
-								stops: [0, 100],
-							},
 						},
 					}}
 					type="area"
