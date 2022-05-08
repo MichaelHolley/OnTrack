@@ -53,28 +53,42 @@ export const ActivityCard = (props: Props) => {
 					]}
 					options={{
 						chart: {
+							type: 'area',
 							background: 'transparent',
 							toolbar: {
 								show: false,
 							},
+							zoom: { autoScaleYaxis: true },
 						},
+						dataLabels: { enabled: true },
 						theme: {
 							mode: isDark ? 'dark' : 'light',
 						},
 						xaxis: {
 							categories: props.activity.values.map((a) =>
-								new Date(a.date).toLocaleDateString(undefined, {
-									year: 'numeric',
-									month: '2-digit',
-									day: '2-digit',
-								})
+								new Date(a.date).getTime()
 							),
+							type: 'datetime',
+						},
+						tooltip: {
+							x: {
+								format: 'dd MMM yyyy',
+							},
 						},
 						yaxis: {
 							min: 0,
 						},
+						fill: {
+							type: 'gradient',
+							gradient: {
+								shadeIntensity: 0.1,
+								opacityFrom: 0.9,
+								opacityTo: 0.0,
+								stops: [0, 100],
+							},
+						},
 					}}
-					type="line"
+					type="area"
 					height={260}
 				/>
 			</Card.Section>
