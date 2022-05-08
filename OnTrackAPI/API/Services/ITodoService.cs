@@ -68,8 +68,10 @@ namespace API.Services
 			else
 			{
 				TodoItem todo = new TodoItem();
+
 				todo.Id = Guid.NewGuid();
 				todo.Title = item.Title;
+				todo.State = item.State;
 				todo.Created = DateTime.UtcNow;
 				todo.UserId = userId;
 
