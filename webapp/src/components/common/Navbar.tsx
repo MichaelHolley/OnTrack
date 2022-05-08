@@ -3,17 +3,19 @@ import {
 	createStyles,
 	Group,
 	Navbar,
-	useMantineColorScheme
+	useMantineColorScheme,
 } from '@mantine/core';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+	BrandGithub,
 	ChartDots,
 	Home,
 	LayoutSidebarLeftCollapse,
 	LayoutSidebarLeftExpand,
 	ListCheck,
-	MoonStars, Sun
+	MoonStars,
+	Sun,
 } from 'tabler-icons-react';
 
 const useStyles = createStyles((theme, _params, getRef) => {
@@ -129,6 +131,7 @@ export default function VerticalNavbar() {
 			})}
 			to={item.link}
 			key={item.label}
+			title={item.label}
 			onClick={() => {
 				setActiveRoute(item.link);
 			}}>
@@ -161,6 +164,20 @@ export default function VerticalNavbar() {
 			</Navbar.Section>
 
 			<Navbar.Section>
+				<Group>
+					<a
+						title="Feedback on GitHub"
+						className={cx(classes.link)}
+						href="https://github.com/MichaelHolley/OnTrack/discussions"
+						key="GitHub">
+						<BrandGithub className={classes.linkIcon} />
+						{!collapsed && (
+							<span className={classes.linkText}>
+								Feedback, Issues & Suggestions
+							</span>
+						)}
+					</a>
+				</Group>
 				<Group
 					className={classes.footer}
 					position={'left'}
