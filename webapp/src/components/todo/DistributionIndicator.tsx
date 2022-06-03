@@ -1,4 +1,4 @@
-import { useMantineColorScheme, useMantineTheme } from '@mantine/core';
+import { Tooltip, useMantineColorScheme, useMantineTheme } from '@mantine/core';
 import React, { FunctionComponent } from 'react';
 import { TodoItem } from '../../models';
 
@@ -14,6 +14,16 @@ const DistributionIndicator: FunctionComponent<Props> = (props) => {
 	const { colorScheme } = useMantineColorScheme();
 	const isDark = colorScheme === 'dark';
 
+	const getWidth = (count: number) => {
+		return (
+			(count /
+				(props.open.length +
+					props.inProgress.length +
+					(props.showComplete ? props.complete.length : 0))) *
+			100
+		);
+	};
+
 	return (
 		<div
 			style={{
@@ -22,48 +32,54 @@ const DistributionIndicator: FunctionComponent<Props> = (props) => {
 				borderRadius: 5,
 				display: 'flex',
 			}}>
-			<div
+			<Tooltip
 				id="open"
+				position="bottom"
+				label="Open"
+				radius="lg"
 				style={{
-					backgroundColor: theme.colors.red[8],
-					height: 4,
-					width: `${
-						(props.open.length /
-							(props.open.length +
-								props.inProgress.length +
-								(props.showComplete ? props.complete.length : 0))) *
-						100
-					}%`,
+					width: `${getWidth(props.open.length)}%`,
 					marginRight: 5,
-				}}></div>
-			<div
-				id="inProgress"
-				style={{
-					backgroundColor: theme.colors.red[6],
-					height: 4,
-					width: `${
-						(props.inProgress.length /
-							(props.open.length +
-								props.inProgress.length +
-								(props.showComplete ? props.complete.length : 0))) *
-						100
-					}%`,
-					marginRight: props.showComplete ? 5 : 0,
-				}}></div>
-			{props.showComplete && (
+				}}>
 				<div
-					id="complete"
 					style={{
-						backgroundColor: theme.colors.red[4],
+						backgroundColor: theme.colors.red[8],
 						height: 4,
-						width: `${
-							(props.complete.length /
-								(props.open.length +
-									props.inProgress.length +
-									props.complete.length)) *
-							100
-						}%`,
-					}}></div>
+					}}
+				/>
+			</Tooltip>
+			<Tooltip
+				id="inProgress"
+				position="bottom"
+				label="In Progress"
+				radius="lg"
+				style={{
+					width: `${getWidth(props.inProgress.length)}%`,
+					marginRight: props.showComplete ? 5 : 0,
+				}}>
+				<div
+					style={{
+						backgroundColor: theme.colors.red[6],
+						height: 4,
+					}}
+				/>
+			</Tooltip>
+			{props.showComplete && (
+				<Tooltip
+					id="complete"
+					position="bottom"
+					label="Complete"
+					radius="lg"
+					style={{
+						width: `${getWidth(props.complete.length)}%`,
+					}}>
+					<div
+						style={{
+							backgroundColor: theme.colors.red[4],
+							height: 4,
+						}}
+					/>
+				</Tooltip>
 			)}
 		</div>
 	);
