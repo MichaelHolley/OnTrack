@@ -10,11 +10,11 @@ namespace API.Services
 {
 	public interface IAuthService
 	{
-		public User Authenticate(Payload payload);
-		public JwtSecurityToken GenerateAccessToken(string secret, string issuer, User user);
-		public string GenerateRefreshToken();
-		public string GenerateAndSetUserRefreshToken(User user);
-		public ClaimsPrincipal GetPrincipalFromExpiredToken(string token, string secret, string issuer);
+		User Authenticate(Payload payload);
+		JwtSecurityToken GenerateAccessToken(string secret, string issuer, User user);
+		string GenerateRefreshToken();
+		string GenerateAndSetUserRefreshToken(User user);
+		ClaimsPrincipal GetPrincipalFromExpiredToken(string token, string secret, string issuer);
 
 	}
 

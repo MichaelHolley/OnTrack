@@ -29,3 +29,41 @@ export const formatDate = (date: Date) => {
 
 	return date.getFullYear() + '-' + month + '-' + day;
 };
+
+export const getSortedActivities = (activities: Activity[]) => {
+	return activities.sort((a, b) => {
+		return (
+			(b.modified !== undefined && b.modified !== null
+				? new Date(b.modified).getTime()
+				: new Date(b.created).getTime()) -
+			(a.modified !== undefined && a.modified !== null
+				? new Date(a.modified).getTime()
+				: new Date(a.created).getTime())
+		);
+	});
+};
+
+export const deleteActivityValue = (
+	activityId: string,
+	date: Date,
+	value: number
+) => {
+	return axios.put<Activity>(URL + '/' + activityId + '/deletevalue', {
+		date: formatDate(date),
+		value: value,
+	});
+};
+
+export const updateActivitiyValue = (
+	activityId: string,
+	oldVal: ActivityValue,
+	newVal: ActivityValue
+) => {
+	return axios.put<Activity>(
+		URL + '/' + activityId + '/updatevalue',
+		{ date: formatDate(newVal.date), value: newVal.value },
+		{
+			params: { oldDate: formatDate(oldVal.date), oldVal: oldVal.value },
+		}
+	);
+};

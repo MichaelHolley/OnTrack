@@ -7,9 +7,9 @@ namespace API.Services
 {
 	public interface ITodoService
 	{
-		public ICollection<TodoItem> GetTodoItems(TodoState? state);
-		public TodoItem CreateOrUpdate(TodoItem item);
-		public void Delete(Guid id);
+		ICollection<TodoItem> GetTodoItems(TodoState? state);
+		TodoItem CreateOrUpdate(TodoItem item);
+		void Delete(Guid id);
 	}
 
 	public class TodoService : ITodoService
@@ -68,8 +68,10 @@ namespace API.Services
 			else
 			{
 				TodoItem todo = new TodoItem();
+
 				todo.Id = Guid.NewGuid();
 				todo.Title = item.Title;
+				todo.State = item.State;
 				todo.Created = DateTime.UtcNow;
 				todo.UserId = userId;
 

@@ -89,7 +89,13 @@ function App() {
 									/>
 									<Route
 										path="todo"
-										element={<Todo setLoading={setLoading} />}
+										element={
+											<Todo
+												setLoading={setLoading}
+												showComplete={true}
+												flatDistributionIndicator={true}
+											/>
+										}
 									/>
 								</Routes>
 							)}

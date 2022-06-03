@@ -1,17 +1,19 @@
 import { ActionIcon, Group, Text } from '@mantine/core';
 import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
 import { useModals } from '@mantine/modals';
-import React from 'react';
-import { ArrowRight, Trash } from 'tabler-icons-react';
+import React, { FunctionComponent } from 'react';
+import { ArrowRight, Check, Trash } from 'tabler-icons-react';
 import { TodoItem, TodoState } from '../../models';
 import { createOrUpdateTodo, deleteTodo } from '../../providers/TodosService';
 
-const TodoListItem = (props: {
+interface Props {
 	todoItem: TodoItem;
 	items: TodoItem[];
 	listHandler: UseListStateHandler<TodoItem>;
 	nextStateHandler?: UseListStateHandler<TodoItem>;
-}) => {
+}
+
+const TodoListItem: FunctionComponent<Props> = (props) => {
 	const modals = useModals();
 
 	const removeItemFromList = () => {
@@ -61,7 +63,11 @@ const TodoListItem = (props: {
 								? 'Set in progress'
 								: 'Complete'
 						}>
-						<ArrowRight />
+						{props.todoItem.state === TodoState.Open ? (
+							<ArrowRight />
+						) : (
+							<Check />
+						)}
 					</ActionIcon>
 				)}
 			</Group>
