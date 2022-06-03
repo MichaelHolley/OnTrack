@@ -63,6 +63,7 @@ export const AddValueDrawer: FunctionComponent<Props> = (props) => {
 					required
 					label="Value"
 					placeholder="Enter the value"
+					precision={2}
 					{...addValueForm.getInputProps('value')}
 				/>
 				<Group position="right" mt="md">

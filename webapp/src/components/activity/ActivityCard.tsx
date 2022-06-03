@@ -118,6 +118,7 @@ export const ActivityCard: FunctionComponent<Props> = (props) => {
 					placeholder="Enter the value"
 					value={editValueValue}
 					onChange={setEditValueValue}
+					precision={2}
 				/>
 				<Space h={'sm'} />
 				<Group position="right">
