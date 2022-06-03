@@ -8,7 +8,7 @@ import {
 	useMantineTheme,
 } from '@mantine/core';
 import { useModals } from '@mantine/modals';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { CirclePlus, Trash } from 'tabler-icons-react';
 import { Activity } from '../../models';
@@ -20,7 +20,7 @@ interface Props {
 	onSuccess: () => void;
 }
 
-export const ActivityCard = (props: Props) => {
+export const ActivityCard: FunctionComponent<Props> = (props) => {
 	const { colorScheme } = useMantineColorScheme();
 	const isDark = colorScheme === 'dark';
 

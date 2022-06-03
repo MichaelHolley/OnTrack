@@ -1,7 +1,7 @@
 import { Button, Drawer, Group, NumberInput, TextInput } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useForm } from '@mantine/hooks';
-import React, { useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Activity } from '../../models';
 import { addValue } from '../../providers/ActivitiesService';
 
@@ -13,7 +13,7 @@ interface Props {
 	onSuccess: () => void;
 }
 
-export function AddValueDrawer(props: Props) {
+export const AddValueDrawer: FunctionComponent<Props> = (props) => {
 	const [selectedDate, setSelectedDate] = useState<Date | null>();
 
 	const addValueForm = useForm({
@@ -73,4 +73,4 @@ export function AddValueDrawer(props: Props) {
 			</form>
 		</Drawer>
 	);
-}
+};

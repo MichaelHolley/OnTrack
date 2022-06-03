@@ -1,16 +1,17 @@
 import {
-	Grid,
 	Group,
 	SimpleGrid,
 	Space,
 	Title,
+	useMantineColorScheme,
 	useMantineTheme,
 } from '@mantine/core';
 import { useListState } from '@mantine/hooks';
-import React, { useEffect } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { Check, ClearAll, Run } from 'tabler-icons-react';
 import { TitleDivider } from '../components/common/TitleDivider';
+import DistributionIndicator from '../components/todo/DistributionIndicator';
 import TodoList from '../components/todo/TodoList';
 import { TodoItem, TodoState } from '../models';
 import { getTodos } from '../providers/TodosService';
@@ -18,14 +19,17 @@ import { getTodos } from '../providers/TodosService';
 interface Props {
 	setLoading: (val: boolean) => void;
 	showComplete?: boolean;
+	flatDistributionIndicator?: boolean;
 }
 
-const Todo = (props: Props) => {
+const Todo: FunctionComponent<Props> = (props) => {
 	const [open, openHandlers] = useListState<TodoItem>();
 	const [inProgress, inProgressHandlers] = useListState<TodoItem>();
 	const [complete, completeHandlers] = useListState<TodoItem>();
 
 	const theme = useMantineTheme();
+	const { colorScheme } = useMantineColorScheme();
+	const isDark = colorScheme === 'dark';
 
 	const loadData = () => {
 		props.setLoading(true);
@@ -63,6 +67,15 @@ const Todo = (props: Props) => {
 				<Title>ToDo</Title>
 			</Group>
 			<Space h={'lg'} />
+
+			{props.flatDistributionIndicator && (
+				<DistributionIndicator
+					open={open}
+					inProgress={inProgress}
+					complete={complete}
+					showComplete={!!props.showComplete}
+				/>
+			)}
 
 			<SimpleGrid
 				cols={2}
@@ -117,12 +130,31 @@ const Todo = (props: Props) => {
 										stroke: {
 											width: 0,
 										},
+										dataLabels: {
+											style: {
+												colors: [
+													isDark ? theme.colors.red[0] : theme.colors.dark[9],
+												],
+												fontSize: '14',
+												fontFamily: theme.fn.fontStyles().fontFamily,
+											},
+											dropShadow: { enabled: false },
+										},
 										labels: ['Open', 'InProgress', 'Complete'],
 										colors: [
 											theme.colors.red[8],
 											theme.colors.red[6],
 											theme.colors.red[4],
 										],
+										legend: {
+											labels: {
+												colors: isDark
+													? theme.colors.dark[0]
+													: theme.colors.dark[9],
+											},
+											fontSize: '14',
+											fontFamily: theme.fn.fontStyles().fontFamily,
+										},
 									}}
 									type="donut"
 								/>

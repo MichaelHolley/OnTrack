@@ -1,18 +1,20 @@
 import { ActionIcon, Paper, ScrollArea, TextInput } from '@mantine/core';
 import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
-import React, { useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Plus } from 'tabler-icons-react';
 import { TodoItem, TodoState } from '../../models';
 import { createOrUpdateTodo } from '../../providers/TodosService';
 import TodoListItem from './TodoListItem';
 
-const TodoList = (props: {
+interface Props {
 	items: TodoItem[];
 	state: TodoState;
 	height: number;
 	listHandler: UseListStateHandler<TodoItem>;
 	nextStateHandler?: UseListStateHandler<TodoItem>;
-}) => {
+}
+
+const TodoList: FunctionComponent<Props> = (props) => {
 	const [addInput, setAddInput] = useState('');
 
 	const addAction = () => {

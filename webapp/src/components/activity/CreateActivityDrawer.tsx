@@ -1,6 +1,6 @@
 import { Button, Drawer, Group, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import { createActivity } from '../../providers/ActivitiesService';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 	onSuccess: () => void;
 }
 
-export const CreateActivityDrawer = (props: Props) => {
+export const CreateActivityDrawer: FunctionComponent<Props> = (props) => {
 	const createForm = useForm({
 		initialValues: {
 			title: '',

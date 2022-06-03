@@ -1,16 +1,28 @@
-import React, { useEffect } from 'react';
-import { Title } from '@mantine/core';
+import { Space } from '@mantine/core';
+import React, { FunctionComponent, useEffect } from 'react';
+import Activities from './Activities';
+import Todo from './Todo';
 
 interface Props {
 	setLoading: (val: boolean) => void;
 }
 
-const Home = (props: Props) => {
+const Home: FunctionComponent<Props> = (props) => {
 	useEffect(() => {
 		props.setLoading(false);
 	}, []);
 
-	return <Title>Home</Title>;
+	return (
+		<>
+			<Todo
+				showComplete={false}
+				setLoading={props.setLoading}
+				flatDistributionIndicator={true}
+			/>
+			<Space h={'lg'} />
+			<Activities setLoading={props.setLoading} limit={3} />
+		</>
+	);
 };
 
 export default Home;

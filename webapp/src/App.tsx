@@ -85,13 +85,17 @@ function App() {
 									<Route path="" element={<Home setLoading={setLoading} />} />
 									<Route
 										path="activities"
-										element={
-											<Activities setLoading={setLoading} display="grid" />
-										}
+										element={<Activities setLoading={setLoading} />}
 									/>
 									<Route
 										path="todo"
-										element={<Todo setLoading={setLoading} showComplete={true}/>}
+										element={
+											<Todo
+												setLoading={setLoading}
+												showComplete={true}
+												flatDistributionIndicator={true}
+											/>
+										}
 									/>
 								</Routes>
 							)}

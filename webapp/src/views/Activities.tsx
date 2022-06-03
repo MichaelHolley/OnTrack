@@ -1,17 +1,10 @@
-import {
-	Button,
-	Group,
-	ScrollArea,
-	SimpleGrid,
-	Space,
-	Title,
-} from '@mantine/core';
-import React, { useEffect, useState } from 'react';
+import { Button, Group, SimpleGrid, Space, Title } from '@mantine/core';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { CirclePlus } from 'tabler-icons-react';
-import { Activity } from '../models';
 import { ActivityCard } from '../components/activity/ActivityCard';
 import { AddValueDrawer } from '../components/activity/AddValueDrawer';
 import { CreateActivityDrawer } from '../components/activity/CreateActivityDrawer';
+import { Activity } from '../models';
 import {
 	getActivities,
 	getSortedActivities,
@@ -20,10 +13,9 @@ import {
 interface Props {
 	setLoading: (val: boolean) => void;
 	limit?: number;
-	display: 'row' | 'grid';
 }
 
-const Activities = (props: Props) => {
+const Activities: FunctionComponent<Props> = (props) => {
 	const [activities, setActivities] = useState<Activity[]>([]);
 
 	const [showCreateForm, setShowCreateForm] = useState(false);
@@ -88,22 +80,15 @@ const Activities = (props: Props) => {
 				</Button>
 			</Group>
 			<Space h={'lg'} />
-			{props.display == 'grid' && (
-				<SimpleGrid
-					cols={3}
-					spacing={'md'}
-					breakpoints={[
-						{ maxWidth: 1400, cols: 2 },
-						{ maxWidth: 950, cols: 1 },
-					]}>
-					{cards}
-				</SimpleGrid>
-			)}
-			{props.display == 'row' && (
-				<ScrollArea style={{ display: 'flex', flexDirection: 'row' }}>
-					{cards}
-				</ScrollArea>
-			)}
+			<SimpleGrid
+				cols={3}
+				spacing={'md'}
+				breakpoints={[
+					{ maxWidth: 1400, cols: 2 },
+					{ maxWidth: 950, cols: 1 },
+				]}>
+				{cards}
+			</SimpleGrid>
 			<CreateActivityDrawer
 				showDrawer={showCreateForm}
 				setShowDrawer={setShowCreateForm}
