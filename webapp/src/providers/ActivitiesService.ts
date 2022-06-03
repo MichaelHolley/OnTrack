@@ -42,3 +42,28 @@ export const getSortedActivities = (activities: Activity[]) => {
 		);
 	});
 };
+
+export const deleteActivityValue = (
+	activityId: string,
+	date: Date,
+	value: number
+) => {
+	return axios.put<Activity>(URL + '/' + activityId + '/deletevalue', {
+		date: formatDate(date),
+		value: value,
+	});
+};
+
+export const updateActivitiyValue = (
+	activityId: string,
+	oldVal: ActivityValue,
+	newVal: ActivityValue
+) => {
+	return axios.put<Activity>(
+		URL + '/' + activityId + '/updatevalue',
+		{ date: formatDate(newVal.date), value: newVal.value },
+		{
+			params: { oldDate: formatDate(oldVal.date), oldVal: oldVal.value },
+		}
+	);
+};

@@ -7,9 +7,9 @@ namespace API.Services
 {
 	public interface ITodoService
 	{
-		public ICollection<TodoItem> GetTodoItems(TodoState? state);
-		public TodoItem CreateOrUpdate(TodoItem item);
-		public void Delete(Guid id);
+		ICollection<TodoItem> GetTodoItems(TodoState? state);
+		TodoItem CreateOrUpdate(TodoItem item);
+		void Delete(Guid id);
 	}
 
 	public class TodoService : ITodoService

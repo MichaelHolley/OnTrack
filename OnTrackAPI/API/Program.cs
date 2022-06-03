@@ -147,6 +147,18 @@ app.MapDelete("/api/activities/{id}/delete", ([FromServices] IActivityService ac
 	return Results.Ok();
 }).RequireAuthorization();
 
+app.MapPut("/api/activities/{id}/deletevalue", ([FromServices] IActivityService activityService, Guid id, ActivityValue delete) =>
+{
+	var activity = activityService.DeleteValue(id, delete);
+	return Results.Ok(activity);
+}).RequireAuthorization();
+
+app.MapPut("/api/activities/{id}/updatevalue", ([FromServices] IActivityService activityService, Guid id, string oldDate, decimal oldVal, ActivityValue update) =>
+{
+	var activity = activityService.UpdateValue(id, oldDate, oldVal, update);
+	return Results.Ok(activity);
+}).RequireAuthorization();
+
 app.MapGet("/api/todos", ([FromServices] ITodoService todoService, TodoState? state) =>
 {
 	return Results.Ok(todoService.GetTodoItems(state));

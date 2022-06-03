@@ -7,12 +7,14 @@ namespace API.Services
 {
 	public interface IActivityService
 	{
-		public ICollection<Activity> GetActivities();
-		public Activity GetActivityById(Guid id);
-		public Activity Create(Activity activity);
-		public Activity? Update(Activity activity);
-		public Activity? AddValue(Guid activityId, ActivityValue value);
-		public void Delete(Guid activityId);
+		ICollection<Activity> GetActivities();
+		Activity GetActivityById(Guid id);
+		Activity Create(Activity activity);
+		Activity? Update(Activity activity);
+		Activity? AddValue(Guid activityId, ActivityValue value);
+		void Delete(Guid activityId);
+		Activity DeleteValue(Guid activityId, ActivityValue delete);
+		Activity UpdateValue(Guid id, string oldDate, decimal oldVal, ActivityValue update);
 	}
 
 	public class ActivityService : IActivityService
@@ -67,9 +69,27 @@ namespace API.Services
 			if (delete != null)
 			{
 				delete.Deleted = DateTime.UtcNow;
-
 				Replace(delete);
 			}
+		}
+
+		public Activity DeleteValue(Guid id, ActivityValue delete)
+		{
+			var activity = GetActivityById(id);
+
+			if (activity != null)
+			{
+				activity.Modified = DateTime.UtcNow;
+				var val = activity.Values.FirstOrDefault(v => v.Date.Equals(delete.Date) && v.Value == delete.Value);
+
+				if (val != default)
+				{
+					activity.Values.Remove(val);
+					Replace(activity);
+				}
+			}
+
+			return activity;
 		}
 
 		public ICollection<Activity> GetActivities()
@@ -98,6 +118,26 @@ namespace API.Services
 			}
 
 			return existing;
+		}
+
+		public Activity UpdateValue(Guid id, string oldDate, decimal oldVal, ActivityValue update)
+		{
+			var activity = GetActivityById(id);
+
+			if (activity != null)
+			{
+				activity.Modified = DateTime.UtcNow;
+				var val = activity.Values.FirstOrDefault(v => v.Date.Equals(oldDate) && v.Value == oldVal);
+
+				if (val != default)
+				{
+					activity.Values.Remove(val);
+					activity.Values.Add(update);
+					Replace(activity);
+				}
+			}
+
+			return activity;
 		}
 
 		private void Replace(Activity activity)

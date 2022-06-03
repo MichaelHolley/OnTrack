@@ -6,10 +6,10 @@ namespace API.Services
 {
 	public interface IUserService
 	{
-		public User GetUserById(Guid id);
-		public User GetUserByMail(string mail);
-		public void AddUser(User user);
-		public void UpdateUserRefreshToken(Guid userId, string refreshToken);
+		User GetUserById(Guid id);
+		User GetUserByMail(string mail);
+		void AddUser(User user);
+		void UpdateUserRefreshToken(Guid userId, string refreshToken);
 	}
 
 	public class UserService : IUserService
