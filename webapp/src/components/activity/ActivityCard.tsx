@@ -91,7 +91,7 @@ export const ActivityCard: FunctionComponent<Props> = (props) => {
 										props.activity.id,
 										editValue.date,
 										editValue.value
-									).then((res) => {
+									).then(() => {
 										resetEditActivityModal();
 										props.onSuccess();
 									});
@@ -127,7 +127,7 @@ export const ActivityCard: FunctionComponent<Props> = (props) => {
 								updateActivitiyValue(props.activity.id, editValue, {
 									date: editValueDate,
 									value: editValueValue,
-								}).then((res) => {
+								}).then(() => {
 									resetEditActivityModal();
 									props.onSuccess();
 								});
