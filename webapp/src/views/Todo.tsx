@@ -63,9 +63,7 @@ const Todo: FunctionComponent<Props> = (props) => {
 
 	return (
 		<>
-			<Group position="left">
-				<Title>ToDo</Title>
-			</Group>
+			<Title>ToDo</Title>
 			<Space h={'lg'} />
 
 			{props.flatDistributionIndicator && (

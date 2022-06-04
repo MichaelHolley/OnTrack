@@ -181,6 +181,9 @@ export const ActivityCard: FunctionComponent<Props> = (props) => {
 						},
 						fill: {
 							type: 'gradient',
+							gradient: {
+								opacityTo: 0.1
+							}
 						},
 					}}
 					type="area"
