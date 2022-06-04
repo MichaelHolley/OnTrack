@@ -2,7 +2,7 @@ import {
 	createStyles,
 	Tooltip,
 	useMantineColorScheme,
-	useMantineTheme
+	useMantineTheme,
 } from '@mantine/core';
 import React, { FunctionComponent } from 'react';
 import { TodoItem } from '../../models';
@@ -14,7 +14,7 @@ interface Props {
 	showComplete: boolean;
 }
 
-const useStyles = createStyles((theme, _params, getRef) => {
+const useStyles = createStyles(() => {
 	return {
 		indicator: {
 			height: 4,
