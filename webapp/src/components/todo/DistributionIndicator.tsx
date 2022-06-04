@@ -1,4 +1,9 @@
-import { Tooltip, useMantineColorScheme, useMantineTheme } from '@mantine/core';
+import {
+	createStyles,
+	Tooltip,
+	useMantineColorScheme,
+	useMantineTheme
+} from '@mantine/core';
 import React, { FunctionComponent } from 'react';
 import { TodoItem } from '../../models';
 
@@ -9,10 +14,20 @@ interface Props {
 	showComplete: boolean;
 }
 
+const useStyles = createStyles((theme, _params, getRef) => {
+	return {
+		indicator: {
+			height: 4,
+			borderRadius: 5,
+		},
+	};
+});
+
 const DistributionIndicator: FunctionComponent<Props> = (props) => {
 	const theme = useMantineTheme();
 	const { colorScheme } = useMantineColorScheme();
 	const isDark = colorScheme === 'dark';
+	const { classes } = useStyles();
 
 	const getWidth = (count: number) => {
 		return (
@@ -28,7 +43,7 @@ const DistributionIndicator: FunctionComponent<Props> = (props) => {
 		<div
 			style={{
 				backgroundColor: isDark ? theme.colors.dark[6] : theme.colors.gray[3],
-				padding: 3,
+				padding: 2,
 				borderRadius: 5,
 				display: 'flex',
 			}}>
@@ -39,12 +54,12 @@ const DistributionIndicator: FunctionComponent<Props> = (props) => {
 				radius="lg"
 				style={{
 					width: `${getWidth(props.open.length)}%`,
-					marginRight: 5,
+					marginRight: 3,
 				}}>
 				<div
+					className={classes.indicator}
 					style={{
 						backgroundColor: theme.colors.red[8],
-						height: 4,
 					}}
 				/>
 			</Tooltip>
@@ -55,12 +70,12 @@ const DistributionIndicator: FunctionComponent<Props> = (props) => {
 				radius="lg"
 				style={{
 					width: `${getWidth(props.inProgress.length)}%`,
-					marginRight: props.showComplete ? 5 : 0,
+					marginRight: props.showComplete ? 3 : 0,
 				}}>
 				<div
+					className={classes.indicator}
 					style={{
 						backgroundColor: theme.colors.red[6],
-						height: 4,
 					}}
 				/>
 			</Tooltip>
@@ -74,9 +89,9 @@ const DistributionIndicator: FunctionComponent<Props> = (props) => {
 						width: `${getWidth(props.complete.length)}%`,
 					}}>
 					<div
+						className={classes.indicator}
 						style={{
 							backgroundColor: theme.colors.red[4],
-							height: 4,
 						}}
 					/>
 				</Tooltip>
