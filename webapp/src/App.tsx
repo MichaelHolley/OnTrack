@@ -68,6 +68,7 @@ function App() {
 				<MantineProvider theme={{ colorScheme, primaryColor: 'red' }}>
 					<ModalsProvider>
 						<AppShell
+							fixed
 							navbar={<VerticalNavbar />}
 							sx={(theme) => ({
 								backgroundColor:
