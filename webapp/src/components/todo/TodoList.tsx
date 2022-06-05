@@ -1,6 +1,7 @@
 import { ActionIcon, Paper, ScrollArea, TextInput } from '@mantine/core';
 import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
 import React, { FunctionComponent, useState } from 'react';
+import { animated, useTransition } from 'react-spring';
 import { Plus } from 'tabler-icons-react';
 import { TodoItem, TodoState } from '../../models';
 import { createOrUpdateTodo } from '../../providers/TodosService';
@@ -16,6 +17,15 @@ interface Props {
 
 const TodoList: FunctionComponent<Props> = (props) => {
 	const [addInput, setAddInput] = useState('');
+	const [initialLoad, setInitialLoad] = useState(true);
+
+	const transitions = useTransition(props.items, {
+		from: { x: -100, opacity: 0 },
+		enter: (item, index) => (next) =>
+			next({ x: 0, opacity: 1, delay: initialLoad ? 150 * (index + 1) : 0 }),
+		leave: { x: 100, opacity: 0 },
+		onRest: () => setInitialLoad(false),
+	});
 
 	const addAction = () => {
 		if (!!addInput && addInput !== '') {
@@ -32,14 +42,16 @@ const TodoList: FunctionComponent<Props> = (props) => {
 	return (
 		<Paper>
 			<ScrollArea style={{ height: props.height }}>
-				{props.items.map((item) =>
-					TodoListItem({
-						todoItem: item,
-						items: props.items,
-						listHandler: props.listHandler,
-						nextStateHandler: props.nextStateHandler,
-					})
-				)}
+				{transitions((style, item) => (
+					<animated.div style={style}>
+						<TodoListItem
+							todoItem={item}
+							items={props.items}
+							listHandler={props.listHandler}
+							nextStateHandler={props.nextStateHandler}
+						/>
+					</animated.div>
+				))}
 			</ScrollArea>
 			<TextInput
 				placeholder="Enter a task-description"

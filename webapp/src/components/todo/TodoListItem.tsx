@@ -40,7 +40,7 @@ const TodoListItem: FunctionComponent<Props> = (props) => {
 	return (
 		<Group position="apart">
 			<Text style={{ padding: 8 }}>{props.todoItem.title}</Text>
-			<Group style={{ paddingLeft: 8, paddingRight: 8 }}>
+			<Group style={{ paddingLeft: 8, paddingRight: 24 }}>
 				<ActionIcon onClick={deleteConfirmModal} title="Delete">
 					<Trash />
 				</ActionIcon>
