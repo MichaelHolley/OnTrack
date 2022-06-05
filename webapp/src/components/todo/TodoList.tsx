@@ -1,7 +1,7 @@
 import { ActionIcon, Paper, ScrollArea, TextInput } from '@mantine/core';
 import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
 import React, { FunctionComponent, useState } from 'react';
-import { useTransition, animated } from 'react-spring';
+import { animated, useTransition } from 'react-spring';
 import { Plus } from 'tabler-icons-react';
 import { TodoItem, TodoState } from '../../models';
 import { createOrUpdateTodo } from '../../providers/TodosService';
@@ -17,11 +17,14 @@ interface Props {
 
 const TodoList: FunctionComponent<Props> = (props) => {
 	const [addInput, setAddInput] = useState('');
+	const [initialLoad, setInitialLoad] = useState(true);
 
 	const transitions = useTransition(props.items, {
 		from: { x: -100, opacity: 0 },
-		enter: { x: 0, opacity: 1 },
+		enter: (item, index) => (next) =>
+			next({ x: 0, opacity: 1, delay: initialLoad ? 150 * (index + 1) : 0 }),
 		leave: { x: 100, opacity: 0 },
+		onRest: () => setInitialLoad(false),
 	});
 
 	const addAction = () => {
