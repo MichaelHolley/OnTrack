@@ -1,7 +1,7 @@
 # OnTrack
 Track Activities and Todo-Items with this expanding Dashboard, requiring only a Google-Login.
 
-- Available Dark- and White-Theme
+- Available Dark- and Bright-Theme
 
 ## Backlog
 https://github.com/MichaelHolley/OnTrack/projects/1
