@@ -20,6 +20,7 @@ import {
 	useUser,
 } from './providers/UserContext';
 import Activities from './views/Activities';
+import Expenses from './views/Expenses';
 import Home from './views/Home';
 import Todo from './views/Todo';
 
@@ -86,7 +87,12 @@ function App() {
 									<Route path="" element={<Home setLoading={setLoading} />} />
 									<Route
 										path="activities"
-										element={<Activities setLoading={setLoading} />}
+										element={
+											<Activities
+												setLoading={setLoading}
+												showCreateButton={true}
+											/>
+										}
 									/>
 									<Route
 										path="todo"
@@ -97,6 +103,10 @@ function App() {
 												flatDistributionIndicator={true}
 											/>
 										}
+									/>
+									<Route
+										path="expenses"
+										element={<Expenses setLoading={setLoading} />}
 									/>
 								</Routes>
 							)}
