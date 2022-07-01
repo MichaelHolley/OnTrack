@@ -1,5 +1,6 @@
 using API.Models;
 using API.Models.Activity;
+using API.Models.Expense;
 using API.Models.Todo;
 using API.Services;
 using Google.Apis.Auth;
@@ -46,6 +47,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddSingleton<IActivityService, ActivityService>();
 builder.Services.AddSingleton<ITodoService, TodoService>();
+builder.Services.AddSingleton<IExpenseService, ExpenseService>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpContextAccessor();
@@ -172,6 +174,22 @@ app.MapPost("/api/todos/createorupdate", ([FromServices] ITodoService todoServic
 app.MapDelete("/api/todos/delete", ([FromServices] ITodoService todoService, Guid id) =>
 {
 	todoService.Delete(id);
+	return Results.Ok();
+}).RequireAuthorization();
+
+app.MapGet("/api/expenses", ([FromServices] IExpenseService expenseService) =>
+{
+	return Results.Ok(expenseService.GetExpenses());
+}).RequireAuthorization();
+
+app.MapPost("/api/expenses/createorupdate", ([FromServices] IExpenseService expenseService, Expense expense) =>
+{
+	return Results.Ok(expenseService.CreateOrUpdate(expense));
+}).RequireAuthorization();
+
+app.MapDelete("/api/expenses/delete", ([FromServices] IExpenseService expenseService, Guid id) =>
+{
+	expenseService.Delete(id);
 	return Results.Ok();
 }).RequireAuthorization();
 

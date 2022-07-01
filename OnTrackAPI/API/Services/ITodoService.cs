@@ -27,7 +27,7 @@ namespace API.Services
 			var mongoDatabase = mongoClient.GetDatabase(
 				onTrackDatabaseSettings.Value.DatabaseName);
 
-			todoCollection = mongoDatabase.GetCollection<TodoItem>(onTrackDatabaseSettings.Value.TodoItemsCollectionsName);
+			todoCollection = mongoDatabase.GetCollection<TodoItem>(onTrackDatabaseSettings.Value.TodoItemsCollectionName);
 
 			this.httpContextAccessor = httpContextAccessor;
 		}
@@ -56,7 +56,7 @@ namespace API.Services
 
 			var existing = todoCollection.Find(filter).SingleOrDefault();
 
-			if (existing != null)
+			if (existing != default)
 			{
 				existing.Title = item.Title;
 				existing.State = item.State;
@@ -87,7 +87,7 @@ namespace API.Services
 
 			var existing = todoCollection.Find(filter).SingleOrDefault();
 
-			if (existing != null)
+			if (existing != default)
 			{
 				existing.Deleted = DateTime.UtcNow;
 				todoCollection.ReplaceOne(filter, existing);

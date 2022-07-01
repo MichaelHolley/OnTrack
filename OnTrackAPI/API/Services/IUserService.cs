@@ -56,7 +56,7 @@ namespace API.Services
 			var filter = filterBuilder.Eq(a => a.Id, userId);
 			var existing = userCollection.Find(filter).SingleOrDefault();
 
-			if (existing != null)
+			if (existing != default)
 			{
 				existing.RefreshToken = refreshToken;
 				existing.LastRefresh = DateTime.UtcNow;
