@@ -43,7 +43,5 @@ export interface Expense extends EntityBase {
 	rythm: Rythm;
 	amount: number;
 	color: string;
-	startDate: Date;
-	endDate?: Date;
 	deleted?: Date;
 }

@@ -58,6 +58,7 @@ const Todo: FunctionComponent<Props> = (props) => {
 	};
 
 	useEffect(() => {
+		document.title = "OnTrack | Todo"
 		loadData();
 	}, []);
 

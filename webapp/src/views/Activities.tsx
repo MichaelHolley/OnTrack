@@ -7,7 +7,7 @@ import { CreateActivityDrawer } from '../components/activity/CreateActivityDrawe
 import { Activity } from '../models';
 import {
 	getActivities,
-	getSortedActivities
+	getSortedActivities,
 } from '../providers/ActivitiesService';
 
 interface Props {
@@ -46,6 +46,7 @@ const Activities: FunctionComponent<Props> = (props) => {
 	};
 
 	useEffect(() => {
+		document.title = "OnTrack | Activities"
 		loadData();
 	}, []);
 

@@ -14,11 +14,20 @@ interface Props {
 	edit: (expense: Expense) => void;
 }
 
+type SortProperty = 'amount' | 'ryhtm' | 'created';
+
 const ExpensesTable: FunctionComponent<Props> = (props) => {
 	const theme = useMantineTheme();
 	const modals = useModals();
 
 	const [initialLoad, setInitialLoad] = useState(true);
+	const [sorted, setSorted] = useState<{
+		ascending: boolean;
+		sortBy: SortProperty;
+	}>({
+		ascending: true,
+		sortBy: 'created',
+	});
 
 	const transitions = useTransition(props.data, {
 		from: { x: -100, opacity: 0 },
@@ -39,6 +48,36 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 			},
 		});
 
+	const sortExpenses = (sortBy: SortProperty) => {
+		setSorted({
+			sortBy: sortBy,
+			ascending: !sorted.ascending,
+		});
+
+		let sortedRes: Expense[] = props.data.slice(0);
+		switch (sortBy) {
+			case 'amount':
+				sortedRes = sortedRes.sort((a, b) =>
+					sorted.ascending ? a.amount - b.amount : b.amount - a.amount
+				);
+				break;
+			case 'ryhtm':
+				sortedRes = sortedRes.sort((a, b) =>
+					sorted.ascending ? a.rythm - b.rythm : b.rythm - a.rythm
+				);
+				break;
+			case 'created':
+				sortedRes = sortedRes.sort((a, b) =>
+					sorted.ascending
+						? new Date(a.created).getTime() - new Date(b.created).getTime()
+						: new Date(b.created).getTime() - new Date(a.created).getTime()
+				);
+				break;
+		}
+
+		props.dataHandler.setState(sortedRes);
+	};
+
 	return (
 		<Table
 			highlightOnHover
@@ -51,10 +90,9 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 			<thead>
 				<tr>
 					<th>Title</th>
-					<th>Amount</th>
-					<th>Rythm</th>
-					<th>Start</th>
-					<th>End</th>
+					<th onClick={() => sortExpenses('amount')}>Amount</th>
+					<th onClick={() => sortExpenses('ryhtm')}>Rythm</th>
+					<th onClick={() => sortExpenses('created')}>Created</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -70,12 +108,7 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 						</td>
 						<td>{item.amount}</td>
 						<td>{Rythm[item.rythm]}</td>
-						<td>{new Date(item.startDate).toLocaleDateString('en-EN')}</td>
-						<td>
-							{item.endDate
-								? new Date(item.endDate).toLocaleDateString('en-EN')
-								: undefined}
-						</td>
+						<td>{new Date(item.created).toLocaleDateString('en-EN')}</td>
 						<td>
 							<Group position="right" direction="row" noWrap>
 								<ActionIcon

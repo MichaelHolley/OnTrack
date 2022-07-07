@@ -1,23 +1,24 @@
 import {
 	Button,
 	ColorInput,
+	Divider,
 	Group,
 	NumberInput,
 	Select,
 	SimpleGrid,
 	Space,
-	Stack,
-	TextInput,
-	Title,
+	Stack, TextInput,
+	Title
 } from '@mantine/core';
-import { DatePicker } from '@mantine/dates';
 import { useForm, useListState } from '@mantine/hooks';
 import React, { FunctionComponent, useEffect, useState } from 'react';
+import ExpensesAverageSummary from '../components/expenses/ExpensesAverageSummary';
+import ExpensesSummary from '../components/expenses/ExpensesSummary';
 import ExpensesTable from '../components/expenses/ExpensesTable';
 import { Expense } from '../models';
 import {
 	createOrUpdateExpense,
-	getExpenses,
+	getExpenses
 } from '../providers/ExpenseService';
 
 const DEFAULT_COLOR = '#fa5252';
@@ -32,8 +33,6 @@ const Expenses: FunctionComponent<Props> = (props) => {
 	const [editId, setEditId] = useState<string>();
 	const [formColor, setFormColor] = useState(DEFAULT_COLOR);
 	const [formRythm, setFormRythm] = useState<string>('3');
-	const [formStartDate, setFormStartDate] = useState<Date | null>();
-	const [formEndDate, setFormEndDate] = useState<Date | null>();
 
 	const loadData = () => {
 		expensesHandler.setState([]);
@@ -50,6 +49,7 @@ const Expenses: FunctionComponent<Props> = (props) => {
 	};
 
 	useEffect(() => {
+		document.title = 'OnTrack | Expenses';
 		loadData();
 	}, []);
 
@@ -58,8 +58,6 @@ const Expenses: FunctionComponent<Props> = (props) => {
 		setEditId(undefined);
 		setFormColor(DEFAULT_COLOR);
 		setFormRythm('3');
-		setFormStartDate(null);
-		setFormEndDate(null);
 	};
 
 	const createForm = useForm({
@@ -76,8 +74,6 @@ const Expenses: FunctionComponent<Props> = (props) => {
 		setEditId(expense.id);
 		setFormColor(expense.color);
 		setFormRythm(String(expense.rythm));
-		setFormStartDate(new Date(expense.startDate));
-		setFormEndDate(expense.endDate ? new Date(expense.endDate) : null);
 	};
 
 	return (
@@ -88,35 +84,29 @@ const Expenses: FunctionComponent<Props> = (props) => {
 				onSubmit={createForm.onSubmit((values) => {
 					props.setLoading(true);
 
-					if (formStartDate) {
-						createOrUpdateExpense({
-							id: editId,
-							title: values.title,
-							rythm: parseInt(formRythm),
-							amount: values.amount,
-							color: formColor,
-							startDate: formStartDate,
-							endDate: formEndDate ?? undefined,
+					createOrUpdateExpense({
+						id: editId,
+						title: values.title,
+						rythm: parseInt(formRythm),
+						amount: values.amount,
+						color: formColor,
+					})
+						.then((response) => {
+							if (editId) {
+								expensesHandler.setItem(
+									expenses.findIndex((e) => e.id === editId),
+									response.data
+								);
+							} else {
+								expensesHandler.append(response.data);
+							}
+							props.setLoading(false);
+							resetForm();
 						})
-							.then((response) => {
-								if (editId) {
-									expensesHandler.setItem(
-										expenses.findIndex((e) => e.id === editId),
-										response.data
-									);
-								} else {
-									expensesHandler.append(response.data);
-								}
-								props.setLoading(false);
-								resetForm();
-							})
-							.catch((err) => {
-								console.error(err);
-								props.setLoading(false);
-							});
-					} else {
-						props.setLoading(false);
-					}
+						.catch((err) => {
+							console.error(err);
+							props.setLoading(false);
+						});
 				})}>
 				<SimpleGrid
 					cols={2}
@@ -146,6 +136,8 @@ const Expenses: FunctionComponent<Props> = (props) => {
 								if (val) setFormRythm(val);
 							}}
 						/>
+					</Stack>
+					<Stack>
 						<NumberInput
 							required
 							label="Amount"
@@ -154,21 +146,6 @@ const Expenses: FunctionComponent<Props> = (props) => {
 							step={0.01}
 							min={0}
 							{...createForm.getInputProps('amount')}
-						/>
-					</Stack>
-					<Stack>
-						<DatePicker
-							required
-							label="Start-Date"
-							placeholder="Start of the payment"
-							value={formStartDate}
-							onChange={setFormStartDate}
-						/>
-						<DatePicker
-							label="End-Date"
-							placeholder="End of the payment"
-							value={formEndDate}
-							onChange={setFormEndDate}
 						/>
 						<ColorInput
 							label="Color"
@@ -189,6 +166,12 @@ const Expenses: FunctionComponent<Props> = (props) => {
 				dataHandler={expensesHandler}
 				edit={editExpense}
 			/>
+			<Space h={'lg'} />
+			<Divider label={<Title order={2}>Sum</Title>} />
+			<ExpensesSummary expenses={expenses.filter((e) => !e.deleted)} />
+			<Space h={'lg'} />
+			<Divider label={<Title order={2}>Average</Title>} />
+			<ExpensesAverageSummary expenses={expenses.filter((e) => !e.deleted)} />
 		</>
 	);
 };

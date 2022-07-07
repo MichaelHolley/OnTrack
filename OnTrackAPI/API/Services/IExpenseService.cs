@@ -43,8 +43,6 @@ namespace API.Services
 			{
 				existing.Title = item.Title;
 				existing.Color = item.Color;
-				existing.StartDate = item.StartDate;
-				existing.EndDate = item.EndDate;
 				existing.Rythm = item.Rythm;
 				existing.Amount = item.Amount;
 				existing.Modified = DateTime.UtcNow;
@@ -59,8 +57,6 @@ namespace API.Services
 				expense.Id = Guid.NewGuid();
 				expense.Title = item.Title;
 				expense.Color = item.Color;
-				expense.StartDate = item.StartDate;
-				expense.EndDate = item.EndDate;
 				expense.Rythm = item.Rythm;
 				expense.Amount = item.Amount;
 				expense.Created = DateTime.UtcNow;
