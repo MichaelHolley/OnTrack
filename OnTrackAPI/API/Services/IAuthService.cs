@@ -45,7 +45,7 @@ namespace API.Services
 			var token = new JwtSecurityToken(issuer,
 			  string.Empty,
 			  claims,
-			  expires: DateTime.Now.AddDays(7),
+			  expires: DateTime.Now.AddDays(1),
 			  signingCredentials: creds);
 
 			return token;

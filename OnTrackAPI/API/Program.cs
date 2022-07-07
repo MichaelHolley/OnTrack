@@ -39,7 +39,8 @@ builder.Services.AddAuthentication(x =>
 			ValidIssuer = builder.Configuration["Auth:ValidIssuer"],
 			ValidateIssuerSigningKey = true,
 			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Auth:JwtSecret"])),
-			ValidateLifetime = true
+			ValidateLifetime = true,
+			ClockSkew = TimeSpan.FromMinutes(1),
 		};
 	});
 
