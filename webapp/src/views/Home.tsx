@@ -9,6 +9,7 @@ interface Props {
 
 const Home: FunctionComponent<Props> = (props) => {
 	useEffect(() => {
+		document.title = "OnTrack | Home"
 		props.setLoading(false);
 	}, []);
 

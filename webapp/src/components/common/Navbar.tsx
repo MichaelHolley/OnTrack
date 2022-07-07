@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import {
 	BrandGithub,
 	ChartDots,
+	Coin,
 	Home,
 	LayoutSidebarLeftCollapse,
 	LayoutSidebarLeftExpand,
@@ -108,6 +109,7 @@ const routes = [
 	{ link: '/', label: 'Home', icon: Home },
 	{ link: 'activities', label: 'Activities', icon: ChartDots },
 	{ link: 'todo', label: 'ToDo', icon: ListCheck },
+	{ link: 'expenses', label: 'Monthly Expenses', icon: Coin },
 ];
 
 export default function VerticalNavbar() {
@@ -170,8 +172,7 @@ export default function VerticalNavbar() {
 						className={cx(classes.link)}
 						href="https://github.com/MichaelHolley/OnTrack/discussions"
 						key="GitHub"
-						/* target={'_blank'} */
-					>
+						target="_blank" rel="noreferrer">
 						<BrandGithub className={classes.linkIcon} />
 						{!collapsed && (
 							<span className={classes.linkText}>

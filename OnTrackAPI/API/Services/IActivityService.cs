@@ -41,7 +41,7 @@ namespace API.Services
 		{
 			var activity = GetActivityById(activityId);
 
-			if (activity != null)
+			if (activity != default)
 			{
 				activity.Modified = DateTime.UtcNow;
 				activity.Values.Add(value);
@@ -66,7 +66,7 @@ namespace API.Services
 		{
 			var delete = GetActivityById(activityId);
 
-			if (delete != null)
+			if (delete != default)
 			{
 				delete.Deleted = DateTime.UtcNow;
 				Replace(delete);
@@ -77,7 +77,7 @@ namespace API.Services
 		{
 			var activity = GetActivityById(id);
 
-			if (activity != null)
+			if (activity != default)
 			{
 				activity.Modified = DateTime.UtcNow;
 				var val = activity.Values.FirstOrDefault(v => v.Date.Equals(delete.Date) && v.Value == delete.Value);
@@ -109,7 +109,7 @@ namespace API.Services
 		{
 			var existing = GetActivityById(activity.Id);
 
-			if (activity != null)
+			if (activity != default)
 			{
 				existing.Modified = DateTime.UtcNow;
 				existing.Title = activity.Title;
@@ -124,7 +124,7 @@ namespace API.Services
 		{
 			var activity = GetActivityById(id);
 
-			if (activity != null)
+			if (activity != default)
 			{
 				activity.Modified = DateTime.UtcNow;
 				var val = activity.Values.FirstOrDefault(v => v.Date.Equals(oldDate) && v.Value == oldVal);

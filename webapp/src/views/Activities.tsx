@@ -13,6 +13,7 @@ import {
 interface Props {
 	setLoading: (val: boolean) => void;
 	limit?: number;
+	showCreateButton?: boolean;
 }
 
 const Activities: FunctionComponent<Props> = (props) => {
@@ -45,6 +46,7 @@ const Activities: FunctionComponent<Props> = (props) => {
 	};
 
 	useEffect(() => {
+		document.title = "OnTrack | Activities"
 		loadData();
 	}, []);
 
@@ -70,14 +72,16 @@ const Activities: FunctionComponent<Props> = (props) => {
 		<>
 			<Group position="left">
 				<Title>Activities</Title>
-				<Button
-					variant="light"
-					leftIcon={<CirclePlus />}
-					onClick={() => {
-						setShowCreateForm(true);
-					}}>
-					Create
-				</Button>
+				{props.showCreateButton && (
+					<Button
+						variant="light"
+						leftIcon={<CirclePlus />}
+						onClick={() => {
+							setShowCreateForm(true);
+						}}>
+						Create
+					</Button>
+				)}
 			</Group>
 			<Space h={'lg'} />
 			<SimpleGrid
