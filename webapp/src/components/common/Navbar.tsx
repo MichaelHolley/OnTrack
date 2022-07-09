@@ -172,7 +172,8 @@ export default function VerticalNavbar() {
 						className={cx(classes.link)}
 						href="https://github.com/MichaelHolley/OnTrack/discussions"
 						key="GitHub"
-						target="_blank" rel="noreferrer">
+						target="_blank"
+						rel="noreferrer">
 						<BrandGithub className={classes.linkIcon} />
 						{!collapsed && (
 							<span className={classes.linkText}>

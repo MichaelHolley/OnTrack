@@ -1,6 +1,12 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { GoogleLoginResponse } from 'react-google-login';
+import {
+	getGoogleLoginResponse,
+	getOnTrackUser,
+	setGoogleLoginResponse,
+	setOnTrackUser,
+} from './LocalStorageService';
 
 export interface OnTrackUser {
 	token: string;
@@ -33,29 +39,27 @@ export const UserContext: React.FunctionComponent = (props) => {
 	const [googleResponse, setGoogleResponse] = useState<GoogleLoginResponse>();
 
 	useEffect(() => {
-		const storedUser = localStorage.getItem(USER_KEY);
+		const storedUser = getOnTrackUser();
 		if (storedUser) {
-			const parsedUser = JSON.parse(storedUser) as OnTrackUser;
-			setUser(parsedUser);
+			setUser(storedUser);
 		}
 
-		const storedGoogleResponse = localStorage.getItem(GOOGLE_RESPONSE_KEY);
+		const storedGoogleResponse = getGoogleLoginResponse();
 		if (storedGoogleResponse) {
-			const parsedResponse = JSON.parse(storedGoogleResponse);
-			setGoogleResponse(parsedResponse);
+			setGoogleResponse(storedGoogleResponse);
 		}
 	}, []);
 
 	const setUserData = (user: OnTrackUser | undefined) => {
 		setUser(user);
-		localStorage.setItem(USER_KEY, JSON.stringify(user));
+		setOnTrackUser(user);
 	};
 
 	const setGoogleResponseData = (
 		googleResponse: GoogleLoginResponse | undefined
 	) => {
 		setGoogleResponse(googleResponse);
-		localStorage.setItem(GOOGLE_RESPONSE_KEY, JSON.stringify(googleResponse));
+		setGoogleLoginResponse(googleResponse);
 	};
 
 	return (
@@ -83,19 +87,26 @@ export const loginToApi = (googleToken: string) => {
 	);
 };
 
-export const refreshApiToken = async (user: OnTrackUser) => {
-	axios
-		.post<OnTrackUser>(`${process.env.REACT_APP_API_URL}/refresh-token`, {
+export const refreshApiToken = (user: OnTrackUser) => {
+	return axios.post<OnTrackUser>(
+		`${process.env.REACT_APP_API_URL}/refresh-token`,
+		{
 			tokenId: user.token,
 			refreshToken: user.refreshToken,
-		})
-		.then((res) => {
-			localStorage.setItem(USER_KEY, JSON.stringify(res.data));
-		})
-		.catch((err) => {
-			console.error(err);
-			removeLocalUserData();
-		});
+		}
+	);
+};
+
+export const revokeApiToken = () => {
+	const user = getOnTrackUser();
+
+	return axios.post<OnTrackUser>(
+		`${process.env.REACT_APP_API_URL}/revoke-token`,
+		{
+			tokenId: user?.token,
+			refreshToken: user?.refreshToken,
+		}
+	);
 };
 
 export const removeLocalUserData = () => {
