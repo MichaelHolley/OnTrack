@@ -3,10 +3,13 @@ import React from 'react';
 import GoogleLogin, {
 	GoogleLoginResponse,
 	GoogleLoginResponseOffline,
-	GoogleLogout
+	GoogleLogout,
 } from 'react-google-login';
 import {
-	removeLocalUserData, loginToApi, useUser
+	removeLocalUserData,
+	loginToApi,
+	useUser,
+	revokeApiToken,
 } from '../../providers/UserContext';
 
 const LoginSection = () => {
@@ -44,7 +47,10 @@ const LoginSection = () => {
 					<GoogleLogout
 						clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
 						buttonText="Logout"
-						onLogoutSuccess={clearStoredData}></GoogleLogout>
+						onLogoutSuccess={async () => {
+							await revokeApiToken();
+							clearStoredData();
+						}}></GoogleLogout>
 				</>
 			) : (
 				<GoogleLogin

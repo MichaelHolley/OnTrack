@@ -9,7 +9,7 @@ namespace API.Services
 		User GetUserById(Guid id);
 		User GetUserByMail(string mail);
 		void AddUser(User user);
-		void UpdateUserRefreshToken(Guid userId, string refreshToken);
+		void UpdateUserRefreshToken(Guid userId, string? refreshToken);
 	}
 
 	public class UserService : IUserService
@@ -51,7 +51,7 @@ namespace API.Services
 			return userCollection.Find(filter).SingleOrDefault();
 		}
 
-		public void UpdateUserRefreshToken(Guid userId, string refreshToken)
+		public void UpdateUserRefreshToken(Guid userId, string? refreshToken)
 		{
 			var filter = filterBuilder.Eq(a => a.Id, userId);
 			var existing = userCollection.Find(filter).SingleOrDefault();

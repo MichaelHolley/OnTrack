@@ -86,7 +86,7 @@ app.MapPost("/google-signin", ([FromServices] IAuthService authService, UserView
 
 
 /// <summary>
-/// Refresh OnTrackAPI-Token - requiring previous API-Token + Refresh-Token
+/// Refresh OnTrackAPI-Token - requiring previous API-Token and Refresh-Token
 /// </summary>
 app.MapPost("/refresh-token", ([FromServices] IAuthService authService, [FromServices] IUserService userService, UserView userView) =>
 {
@@ -97,21 +97,48 @@ app.MapPost("/refresh-token", ([FromServices] IAuthService authService, [FromSer
 		var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
 		var user = userService.GetUserById(Guid.Parse(userId));
 
-		if (userView.TokenId == null || user == null || user.RefreshToken != userView.RefreshToken)
+		if (userView.TokenId == null || userView.RefreshToken == null || user == null || user.RefreshToken != userView.RefreshToken)
 		{
 			return Results.BadRequest("Invalid client-request");
 		}
 
 		var newAccessToken = authService.GenerateAccessToken(builder.Configuration["Auth:JwtSecret"], builder.Configuration["Auth:ValidIssuer"], user);
-		var newRefreshToken = authService.GenerateRefreshToken();
-
-		userService.UpdateUserRefreshToken(user.Id, newRefreshToken);
+		var newRefreshToken = authService.GenerateAndSetUserRefreshToken(user);
 
 		return Results.Ok(new
 		{
 			Token = new JwtSecurityTokenHandler().WriteToken(newAccessToken),
 			RefreshToken = newRefreshToken
 		});
+	}
+	catch (Exception ex)
+	{
+		return Results.BadRequest(ex.Message);
+	}
+}).AllowAnonymous();
+
+/// <summary>
+/// Revoke OnTrackAPI-Token - requiring API-Token and Refresh-Token
+/// </summary>
+app.MapPost("/revoke-token", ([FromServices] IAuthService authService, [FromServices] IUserService userService, UserView userView) =>
+{
+	try
+	{
+		var principal = authService.GetPrincipalFromExpiredToken(userView.TokenId, builder.Configuration["Auth:JwtSecret"], builder.Configuration["Auth:ValidIssuer"]);
+
+		var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+		var user = userService.GetUserById(Guid.Parse(userId));
+
+		if (userView.TokenId == null || userView.RefreshToken == null || user == null || user.RefreshToken != userView.RefreshToken)
+		{
+			return Results.BadRequest("Invalid client-request");
+		}
+		else
+		{
+			userService.UpdateUserRefreshToken(user.Id, null);
+
+			return Results.Ok("Token revoked.");
+		}
 	}
 	catch (Exception ex)
 	{
