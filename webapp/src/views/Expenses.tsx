@@ -166,7 +166,6 @@ const Expenses: FunctionComponent<Props> = (props) => {
 				data={expenses}
 				dataHandler={expensesHandler}
 				edit={editExpense}
-				loadDate={() => loadData()}
 			/>
 			<Space h={'lg'} />
 			<Divider label={<Title order={2}>Sum</Title>} />

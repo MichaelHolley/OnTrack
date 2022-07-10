@@ -24,9 +24,11 @@ export const createOrUpdateExpense = (expense: {
 };
 
 export const deleteExpense = (id: string) => {
-	return axios.delete(URL + '/delete', { params: { id: id } });
+	return axios.delete<Expense>(URL + '/delete', { params: { id: id } });
 };
 
 export const reactivateExpense = (id: string) => {
-	return axios.put(URL + '/reactivate', undefined, { params: { id: id } });
+	return axios.put<Expense>(URL + '/reactivate', undefined, {
+		params: { id: id },
+	});
 };

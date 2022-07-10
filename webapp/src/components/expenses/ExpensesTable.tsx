@@ -23,7 +23,6 @@ interface Props {
 	data: Expense[];
 	dataHandler: UseListStateHandler<Expense>;
 	edit: (expense: Expense) => void;
-	loadDate: () => void;
 }
 
 type SortProperty = 'amount' | 'ryhtm' | 'created';
@@ -58,7 +57,14 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 			children: <Text size="sm">This action requires your confirmation.</Text>,
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
 			onConfirm: () => {
-				deleteExpense(id).then(() => props.loadDate());
+				deleteExpense(id).then((resp) => {
+					console.log(resp);
+
+					props.dataHandler.setItem(
+						props.data.findIndex((e) => e.id === resp.data.id),
+						resp.data
+					);
+				});
 			},
 		});
 
@@ -156,8 +162,13 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 													if (!item.deleted) {
 														deleteConfirmModal(item.id);
 													} else {
-														reactivateExpense(item.id).then(() =>
-															props.loadDate()
+														reactivateExpense(item.id).then((resp) =>
+															props.dataHandler.setItem(
+																props.data.findIndex(
+																	(e) => e.id === resp.data.id
+																),
+																resp.data
+															)
 														);
 													}
 												}}>
