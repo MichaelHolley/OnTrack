@@ -7,8 +7,9 @@ import {
 	Select,
 	SimpleGrid,
 	Space,
-	Stack, TextInput,
-	Title
+	Stack,
+	TextInput,
+	Title,
 } from '@mantine/core';
 import { useForm, useListState } from '@mantine/hooks';
 import React, { FunctionComponent, useEffect, useState } from 'react';
@@ -18,7 +19,7 @@ import ExpensesTable from '../components/expenses/ExpensesTable';
 import { Expense } from '../models';
 import {
 	createOrUpdateExpense,
-	getExpenses
+	getExpenses,
 } from '../providers/ExpenseService';
 
 const DEFAULT_COLOR = '#fa5252';
@@ -39,7 +40,7 @@ const Expenses: FunctionComponent<Props> = (props) => {
 		props.setLoading(true);
 		getExpenses()
 			.then((res) => {
-				expensesHandler.setState(res.data.filter((e) => !e.deleted));
+				expensesHandler.setState(res.data);
 				props.setLoading(false);
 			})
 			.catch((err) => {

@@ -1,11 +1,22 @@
-import { ActionIcon, Group, Table, Text, useMantineTheme } from '@mantine/core';
+import {
+	ActionIcon,
+	Group,
+	Space,
+	Switch,
+	Table,
+	Text,
+	useMantineTheme
+} from '@mantine/core';
 import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
 import { useModals } from '@mantine/modals';
 import React, { FunctionComponent, useState } from 'react';
 import { animated, useTransition } from 'react-spring';
-import { Pencil, Trash } from 'tabler-icons-react';
+import { ArrowBackUp, Pencil, Trash } from 'tabler-icons-react';
 import { Expense, Rythm } from '../../models';
-import { deleteExpense } from '../../providers/ExpenseService';
+import {
+	deleteExpense,
+	reactivateExpense
+} from '../../providers/ExpenseService';
 
 interface Props {
 	setLoading: (val: boolean) => void;
@@ -20,6 +31,7 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 	const theme = useMantineTheme();
 	const modals = useModals();
 
+	const [showDeleted, setShowDeleted] = useState(false);
 	const [initialLoad, setInitialLoad] = useState(true);
 	const [sorted, setSorted] = useState<{
 		ascending: boolean;
@@ -29,12 +41,15 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 		sortBy: 'created',
 	});
 
-	const transitions = useTransition(props.data, {
-		from: { x: -100, opacity: 0 },
-		enter: (item, index) => (next) =>
-			next({ x: 0, opacity: 1, delay: initialLoad ? 100 * (index + 1) : 0 }),
-		onRest: () => setInitialLoad(false),
-	});
+	const transitions = useTransition(
+		props.data.filter((e) => !e.deleted || !!e.deleted === showDeleted),
+		{
+			from: { x: -100, opacity: 0 },
+			enter: (item, index) => (next) =>
+				next({ x: 0, opacity: 1, delay: initialLoad ? 100 * (index + 1) : 0 }),
+			onRest: () => setInitialLoad(false),
+		}
+	);
 
 	const deleteConfirmModal = (id: string) =>
 		modals.openConfirmModal({
@@ -42,9 +57,14 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 			children: <Text size="sm">This action requires your confirmation.</Text>,
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
 			onConfirm: () => {
-				deleteExpense(id).then(() =>
-					props.dataHandler.remove(props.data.findIndex((e) => e.id === id))
-				);
+				deleteExpense(id).then((resp) => {
+					console.log(resp);
+
+					props.dataHandler.setItem(
+						props.data.findIndex((e) => e.id === resp.data.id),
+						resp.data
+					);
+				});
 			},
 		});
 
@@ -79,56 +99,88 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 	};
 
 	return (
-		<Table
-			highlightOnHover
-			style={{
-				backgroundColor:
-					theme.colorScheme === 'dark'
-						? theme.colors.dark[7]
-						: theme.colors.gray[0],
-			}}>
-			<thead>
-				<tr>
-					<th>Title</th>
-					<th onClick={() => sortExpenses('amount')}>Amount</th>
-					<th onClick={() => sortExpenses('ryhtm')}>Rythm</th>
-					<th onClick={() => sortExpenses('created')}>Created</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				{transitions((style, item) => (
-					<animated.tr style={style}>
-						<td
-							style={{
-								borderLeftStyle: 'solid',
-								borderLeftColor: item.color,
-							}}>
-							{item.title}
-						</td>
-						<td>{item.amount}</td>
-						<td>{Rythm[item.rythm]}</td>
-						<td>{new Date(item.created).toLocaleDateString('en-EN')}</td>
-						<td>
-							<Group position="right" direction="row" noWrap>
-								<ActionIcon
-									onClick={() => {
-										props.edit(item);
-									}}>
-									<Pencil />
-								</ActionIcon>
-								<ActionIcon
-									onClick={() => {
-										deleteConfirmModal(item.id);
-									}}>
-									<Trash />
-								</ActionIcon>
-							</Group>
-						</td>
-					</animated.tr>
-				))}
-			</tbody>
-		</Table>
+		<div>
+			<Switch
+				label="Include Deleted"
+				checked={showDeleted}
+				onChange={(event) => setShowDeleted(event.currentTarget.checked)}
+			/>
+			<Space h={'md'} />
+			<Table
+				highlightOnHover
+				style={{
+					backgroundColor:
+						theme.colorScheme === 'dark'
+							? theme.colors.dark[7]
+							: theme.colors.gray[0],
+				}}>
+				<thead>
+					<tr>
+						<th>Title</th>
+						<th onClick={() => sortExpenses('amount')}>Amount</th>
+						<th onClick={() => sortExpenses('ryhtm')}>Rythm</th>
+						<th onClick={() => sortExpenses('created')}>Created</th>
+						{showDeleted && <th>Deleted</th>}
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					{transitions(
+						(style, item) =>
+							(!item.deleted || !!item.deleted === showDeleted) && (
+								<animated.tr style={style}>
+									<td
+										style={{
+											borderLeftStyle: 'solid',
+											borderLeftColor: item.color,
+										}}>
+										{item.title}
+									</td>
+									<td>{item.amount}</td>
+									<td>{Rythm[item.rythm]}</td>
+									<td>{new Date(item.created).toLocaleDateString('en-EN')}</td>
+									{showDeleted &&
+										(!item.deleted ? (
+											<td></td>
+										) : (
+											<td>
+												{new Date(item.deleted).toLocaleDateString('en-EN')}
+											</td>
+										))}
+									<td>
+										<Group position="right" direction="row" noWrap>
+											<ActionIcon
+												onClick={() => {
+													props.edit(item);
+												}}
+												disabled={!!item.deleted}>
+												<Pencil />
+											</ActionIcon>
+											<ActionIcon
+												onClick={() => {
+													if (!item.deleted) {
+														deleteConfirmModal(item.id);
+													} else {
+														reactivateExpense(item.id).then((resp) =>
+															props.dataHandler.setItem(
+																props.data.findIndex(
+																	(e) => e.id === resp.data.id
+																),
+																resp.data
+															)
+														);
+													}
+												}}>
+												{item.deleted ? <ArrowBackUp /> : <Trash />}
+											</ActionIcon>
+										</Group>
+									</td>
+								</animated.tr>
+							)
+					)}
+				</tbody>
+			</Table>
+		</div>
 	);
 };
 
