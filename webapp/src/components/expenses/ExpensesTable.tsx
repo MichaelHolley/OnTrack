@@ -116,11 +116,11 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 				}}>
 				<thead>
 					<tr>
-						{showDeleted && <th></th>}
 						<th>Title</th>
 						<th onClick={() => sortExpenses('amount')}>Amount</th>
 						<th onClick={() => sortExpenses('ryhtm')}>Rythm</th>
 						<th onClick={() => sortExpenses('created')}>Created</th>
+						{showDeleted && <th>Deleted</th>}
 						<th></th>
 					</tr>
 				</thead>
@@ -129,14 +129,6 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 						(style, item) =>
 							(!item.deleted || !!item.deleted === showDeleted) && (
 								<animated.tr style={style}>
-									{showDeleted &&
-										(!item.deleted ? (
-											<td></td>
-										) : (
-											<td style={{ justifyContent: 'center' }}>
-												<Minus color={theme.colors.red[8]} size={12} />
-											</td>
-										))}
 									<td
 										style={{
 											borderLeftStyle: 'solid',
@@ -147,7 +139,14 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 									<td>{item.amount}</td>
 									<td>{Rythm[item.rythm]}</td>
 									<td>{new Date(item.created).toLocaleDateString('en-EN')}</td>
-
+									{showDeleted &&
+										(!item.deleted ? (
+											<td></td>
+										) : (
+											<td>
+												{new Date(item.deleted).toLocaleDateString('en-EN')}
+											</td>
+										))}
 									<td>
 										<Group position="right" direction="row" noWrap>
 											<ActionIcon
