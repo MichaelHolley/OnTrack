@@ -19,10 +19,14 @@ export const createOrUpdateExpense = (expense: {
 		title: expense.title,
 		rythm: expense.rythm,
 		amount: expense.amount,
-		color: expense.color
+		color: expense.color,
 	});
 };
 
 export const deleteExpense = (id: string) => {
 	return axios.delete(URL + '/delete', { params: { id: id } });
+};
+
+export const reactivateExpense = (id: string) => {
+	return axios.put(URL + '/reactivate', undefined, { params: { id: id } });
 };

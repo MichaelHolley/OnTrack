@@ -2,6 +2,7 @@ import {
 	ActionIcon,
 	createStyles,
 	Group,
+	Image,
 	Navbar,
 	useMantineColorScheme,
 } from '@mantine/core';
@@ -149,8 +150,10 @@ export default function VerticalNavbar() {
 			style={{ transition: 'width ease-in-out 0.5s' }}>
 			<Navbar.Section grow>
 				<Group
+					direction="row"
+					noWrap
 					className={classes.header}
-					position={'left'}
+					position={'apart'}
 					style={{ paddingLeft: '10px' }}>
 					<ActionIcon
 						onClick={() => setCollapsed(!collapsed)}
@@ -161,6 +164,7 @@ export default function VerticalNavbar() {
 							<LayoutSidebarLeftCollapse size={24} />
 						)}
 					</ActionIcon>
+					<Image src="logo-310.png" height={24} />
 				</Group>
 				{links}
 			</Navbar.Section>
