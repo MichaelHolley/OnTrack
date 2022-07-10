@@ -5,17 +5,17 @@ import {
 	Switch,
 	Table,
 	Text,
-	useMantineTheme,
+	useMantineTheme
 } from '@mantine/core';
 import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
 import { useModals } from '@mantine/modals';
 import React, { FunctionComponent, useState } from 'react';
 import { animated, useTransition } from 'react-spring';
-import { ArrowBackUp, Minus, Pencil, Trash } from 'tabler-icons-react';
+import { ArrowBackUp, Pencil, Trash } from 'tabler-icons-react';
 import { Expense, Rythm } from '../../models';
 import {
 	deleteExpense,
-	reactivateExpense,
+	reactivateExpense
 } from '../../providers/ExpenseService';
 
 interface Props {
