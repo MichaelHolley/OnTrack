@@ -10,6 +10,7 @@ namespace API.Services
 		ICollection<Expense> GetExpenses();
 		Expense CreateOrUpdate(Expense expense);
 		void Delete(Guid id);
+		void Reactivate(Guid id);
 	}
 
 	public class ExpenseService : IExpenseService
@@ -77,6 +78,20 @@ namespace API.Services
 			if (existing != default)
 			{
 				existing.Deleted = DateTime.UtcNow;
+				expenseCollection.ReplaceOne(filter, existing);
+			}
+		}
+
+		public void Reactivate(Guid id)
+		{
+			var userId = httpContextAccessor.HttpContext.GetUserId();
+			var filter = filterBuilder.Where(t => t.Id.Equals(id) && t.UserId.Equals(userId));
+
+			var existing = expenseCollection.Find(filter).SingleOrDefault();
+
+			if (existing != default)
+			{
+				existing.Deleted = null;
 				expenseCollection.ReplaceOne(filter, existing);
 			}
 		}

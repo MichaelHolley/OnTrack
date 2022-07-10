@@ -221,6 +221,12 @@ app.MapDelete("/api/expenses/delete", ([FromServices] IExpenseService expenseSer
 	return Results.Ok();
 }).RequireAuthorization();
 
+app.MapPut("/api/expenses/reactivate", ([FromServices] IExpenseService expenseService, Guid id) =>
+{
+	expenseService.Reactivate(id);
+	return Results.Ok();
+}).RequireAuthorization();
+
 app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 app.UseAuthentication();
