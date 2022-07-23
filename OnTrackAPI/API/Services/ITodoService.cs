@@ -7,9 +7,9 @@ namespace API.Services
 {
 	public interface ITodoService
 	{
-		ICollection<TodoItem> GetTodoItems(TodoState? state);
-		TodoItem CreateOrUpdate(TodoItem item);
-		void Delete(Guid id);
+		Task<ICollection<TodoItem>> GetTodoItemsAsync(TodoState? state);
+		Task<TodoItem> CreateOrUpdateAsync(TodoItem item);
+		Task DeleteAsync(Guid id);
 	}
 
 	public class TodoService : ITodoService
@@ -19,20 +19,15 @@ namespace API.Services
 		private FilterDefinitionBuilder<TodoItem> filterBuilder = Builders<TodoItem>.Filter;
 
 		public TodoService(
-				IOptions<OnTrackDatabaseSettings> onTrackDatabaseSettings, IHttpContextAccessor httpContextAccessor)
+			IOptions<OnTrackDatabaseSettings> onTrackDatabaseSettings,
+			IHttpContextAccessor httpContextAccessor,
+			ICollectionConnector collectionConnector)
 		{
-			var mongoClient = new MongoClient(
-				onTrackDatabaseSettings.Value.ConnectionString);
-
-			var mongoDatabase = mongoClient.GetDatabase(
-				onTrackDatabaseSettings.Value.DatabaseName);
-
-			todoCollection = mongoDatabase.GetCollection<TodoItem>(onTrackDatabaseSettings.Value.TodoItemsCollectionName);
-
+			todoCollection = collectionConnector.GetCollectionByName<TodoItem>(onTrackDatabaseSettings.Value.TodoItemsCollectionName);
 			this.httpContextAccessor = httpContextAccessor;
 		}
 
-		public ICollection<TodoItem> GetTodoItems(TodoState? state)
+		public async Task<ICollection<TodoItem>> GetTodoItemsAsync(TodoState? state)
 		{
 			var userId = httpContextAccessor.HttpContext.GetUserId();
 
@@ -46,15 +41,15 @@ namespace API.Services
 				filter = filterBuilder.Where(t => t.UserId.Equals(userId));
 			}
 
-			return todoCollection.Find(filter).ToList();
+			return (await todoCollection.FindAsync(filter)).ToList();
 		}
 
-		public TodoItem CreateOrUpdate(TodoItem item)
+		public async Task<TodoItem> CreateOrUpdateAsync(TodoItem item)
 		{
 			var userId = httpContextAccessor.HttpContext.GetUserId();
 			var filter = filterBuilder.Where(t => t.Id.Equals(item.Id) && t.UserId.Equals(userId));
 
-			var existing = todoCollection.Find(filter).SingleOrDefault();
+			var existing = (await todoCollection.FindAsync(filter)).SingleOrDefault();
 
 			if (existing != default)
 			{
@@ -62,7 +57,7 @@ namespace API.Services
 				existing.State = item.State;
 				existing.Modified = DateTime.UtcNow;
 
-				todoCollection.ReplaceOne(filter, existing);
+				await todoCollection.ReplaceOneAsync(filter, existing);
 				return existing;
 			}
 			else
@@ -75,22 +70,22 @@ namespace API.Services
 				todo.Created = DateTime.UtcNow;
 				todo.UserId = userId;
 
-				todoCollection.InsertOne(todo);
+				await todoCollection.InsertOneAsync(todo);
 				return todo;
 			}
 		}
 
-		public void Delete(Guid id)
+		public async Task DeleteAsync(Guid id)
 		{
 			var userId = httpContextAccessor.HttpContext.GetUserId();
 			var filter = filterBuilder.Where(t => t.Id.Equals(id) && t.UserId.Equals(userId));
 
-			var existing = todoCollection.Find(filter).SingleOrDefault();
+			var existing = (await todoCollection.FindAsync(filter)).SingleOrDefault();
 
 			if (existing != default)
 			{
 				existing.Deleted = DateTime.UtcNow;
-				todoCollection.ReplaceOne(filter, existing);
+				await todoCollection.ReplaceOneAsync(filter, existing);
 			}
 		}
 	}

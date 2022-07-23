@@ -46,6 +46,7 @@ builder.Services.AddAuthentication(x =>
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddSingleton<ICollectionConnector, CollectionConnector>();
 builder.Services.AddSingleton<IActivityService, ActivityService>();
 builder.Services.AddSingleton<ITodoService, TodoService>();
 builder.Services.AddSingleton<IExpenseService, ExpenseService>();
@@ -62,15 +63,15 @@ app.UseHttpsRedirection();
 /// <summary>
 /// Login using Google-Token
 /// </summary>
-app.MapPost("/google-signin", ([FromServices] IAuthService authService, UserView userView) =>
+app.MapPost("/google-signin", async ([FromServices] IAuthService authService, UserView userView) =>
 {
 	try
 	{
 		var payload = GoogleJsonWebSignature.ValidateAsync(userView.TokenId, new GoogleJsonWebSignature.ValidationSettings()).Result;
-		var user = authService.Authenticate(payload);
+		var user = await authService.AuthenticateAsync(payload);
 
 		var token = authService.GenerateAccessToken(builder.Configuration["Auth:JwtSecret"], builder.Configuration["Auth:ValidIssuer"], user);
-		var refreshToken = authService.GenerateAndSetUserRefreshToken(user);
+		var refreshToken = await authService.GenerateAndSetUserRefreshTokenAsync(user);
 
 		return Results.Ok(new
 		{
@@ -88,14 +89,14 @@ app.MapPost("/google-signin", ([FromServices] IAuthService authService, UserView
 /// <summary>
 /// Refresh OnTrackAPI-Token - requiring previous API-Token and Refresh-Token
 /// </summary>
-app.MapPost("/refresh-token", ([FromServices] IAuthService authService, [FromServices] IUserService userService, UserView userView) =>
+app.MapPost("/refresh-token", async ([FromServices] IAuthService authService, [FromServices] IUserService userService, UserView userView) =>
 {
 	try
 	{
 		var principal = authService.GetPrincipalFromExpiredToken(userView.TokenId, builder.Configuration["Auth:JwtSecret"], builder.Configuration["Auth:ValidIssuer"]);
 
 		var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-		var user = userService.GetUserById(Guid.Parse(userId));
+		var user = await userService.GetUserByIdAsync(Guid.Parse(userId));
 
 		if (userView.TokenId == null || userView.RefreshToken == null || user == null || user.RefreshToken != userView.RefreshToken)
 		{
@@ -103,7 +104,7 @@ app.MapPost("/refresh-token", ([FromServices] IAuthService authService, [FromSer
 		}
 
 		var newAccessToken = authService.GenerateAccessToken(builder.Configuration["Auth:JwtSecret"], builder.Configuration["Auth:ValidIssuer"], user);
-		var newRefreshToken = authService.GenerateAndSetUserRefreshToken(user);
+		var newRefreshToken = await authService.GenerateAndSetUserRefreshTokenAsync(user);
 
 		return Results.Ok(new
 		{
@@ -120,14 +121,14 @@ app.MapPost("/refresh-token", ([FromServices] IAuthService authService, [FromSer
 /// <summary>
 /// Revoke OnTrackAPI-Token - requiring API-Token and Refresh-Token
 /// </summary>
-app.MapPost("/revoke-token", ([FromServices] IAuthService authService, [FromServices] IUserService userService, UserView userView) =>
+app.MapPost("/revoke-token", async ([FromServices] IAuthService authService, [FromServices] IUserService userService, UserView userView) =>
 {
 	try
 	{
 		var principal = authService.GetPrincipalFromExpiredToken(userView.TokenId, builder.Configuration["Auth:JwtSecret"], builder.Configuration["Auth:ValidIssuer"]);
 
 		var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-		var user = userService.GetUserById(Guid.Parse(userId));
+		var user = await userService.GetUserByIdAsync(Guid.Parse(userId));
 
 		if (userView.TokenId == null || userView.RefreshToken == null || user == null || user.RefreshToken != userView.RefreshToken)
 		{
@@ -135,7 +136,7 @@ app.MapPost("/revoke-token", ([FromServices] IAuthService authService, [FromServ
 		}
 		else
 		{
-			userService.UpdateUserRefreshToken(user.Id, null);
+			await userService.UpdateUserRefreshTokenAsync(user.Id, null);
 
 			return Results.Ok("Token revoked.");
 		}
@@ -146,83 +147,83 @@ app.MapPost("/revoke-token", ([FromServices] IAuthService authService, [FromServ
 	}
 }).AllowAnonymous();
 
-app.MapGet("/api/activities", ([FromServices] IActivityService activityService) =>
+app.MapGet("/api/activities", async ([FromServices] IActivityService activityService) =>
 {
-	return Results.Ok(activityService.GetActivities());
+	return Results.Ok(await activityService.GetActivitiesAsync());
 }).RequireAuthorization();
 
-app.MapGet("/api/activities/{id}", ([FromServices] IActivityService activityService, Guid id) =>
+app.MapGet("/api/activities/{id}", async ([FromServices] IActivityService activityService, Guid id) =>
 {
-	return Results.Ok(activityService.GetActivityById(id));
+	return Results.Ok(await activityService.GetActivityByIdAsync(id));
 }).RequireAuthorization();
 
-app.MapPost("/api/activities/create", ([FromServices] IActivityService activityService, Activity activity) =>
+app.MapPost("/api/activities/create", async ([FromServices] IActivityService activityService, Activity activity) =>
 {
-	return Results.Created($"/api/activities/{activity.Id}", activityService.Create(activity));
+	return Results.Created($"/api/activities/{activity.Id}", await activityService.CreateAsync(activity));
 }).RequireAuthorization();
 
-app.MapPut("/api/activities/{id}/addvalue", ([FromServices] IActivityService activityService, Guid id, ActivityValue value) =>
+app.MapPut("/api/activities/{id}/addvalue", async ([FromServices] IActivityService activityService, Guid id, ActivityValue value) =>
 {
-	return Results.Ok(activityService.AddValue(id, value));
+	return Results.Ok(await activityService.AddValueAsync(id, value));
 }).RequireAuthorization();
 
-app.MapPut("/api/activities/{id}/update", ([FromServices] IActivityService activityService, Activity activity) =>
+app.MapPut("/api/activities/{id}/update", async ([FromServices] IActivityService activityService, Activity activity) =>
 {
-	return Results.Ok(activityService.Update(activity));
+	return Results.Ok(await activityService.UpdateAsync(activity));
 }).RequireAuthorization();
 
-app.MapDelete("/api/activities/{id}/delete", ([FromServices] IActivityService activityService, Guid id) =>
+app.MapDelete("/api/activities/{id}/delete", async ([FromServices] IActivityService activityService, Guid id) =>
 {
-	activityService.Delete(id);
+	await activityService.DeleteAsync(id);
 	return Results.Ok();
 }).RequireAuthorization();
 
-app.MapPut("/api/activities/{id}/deletevalue", ([FromServices] IActivityService activityService, Guid id, ActivityValue delete) =>
+app.MapPut("/api/activities/{id}/deletevalue", async ([FromServices] IActivityService activityService, Guid id, ActivityValue delete) =>
 {
-	var activity = activityService.DeleteValue(id, delete);
+	var activity = await activityService.DeleteValueAsync(id, delete);
 	return Results.Ok(activity);
 }).RequireAuthorization();
 
-app.MapPut("/api/activities/{id}/updatevalue", ([FromServices] IActivityService activityService, Guid id, string oldDate, decimal oldVal, ActivityValue update) =>
+app.MapPut("/api/activities/{id}/updatevalue", async ([FromServices] IActivityService activityService, Guid id, string oldDate, decimal oldVal, ActivityValue update) =>
 {
-	var activity = activityService.UpdateValue(id, oldDate, oldVal, update);
+	var activity = await activityService.UpdateValueAsync(id, oldDate, oldVal, update);
 	return Results.Ok(activity);
 }).RequireAuthorization();
 
-app.MapGet("/api/todos", ([FromServices] ITodoService todoService, TodoState? state) =>
+app.MapGet("/api/todos", async ([FromServices] ITodoService todoService, TodoState? state) =>
 {
-	return Results.Ok(todoService.GetTodoItems(state));
+	return Results.Ok(await todoService.GetTodoItemsAsync(state));
 }).RequireAuthorization();
 
-app.MapPost("/api/todos/createorupdate", ([FromServices] ITodoService todoService, TodoItem todo) =>
+app.MapPost("/api/todos/createorupdate", async ([FromServices] ITodoService todoService, TodoItem todo) =>
 {
-	return Results.Ok(todoService.CreateOrUpdate(todo));
+	return Results.Ok(await todoService.CreateOrUpdateAsync(todo));
 }).RequireAuthorization();
 
-app.MapDelete("/api/todos/delete", ([FromServices] ITodoService todoService, Guid id) =>
+app.MapDelete("/api/todos/delete", async ([FromServices] ITodoService todoService, Guid id) =>
 {
-	todoService.Delete(id);
+	await todoService.DeleteAsync(id);
 	return Results.Ok();
 }).RequireAuthorization();
 
-app.MapGet("/api/expenses", ([FromServices] IExpenseService expenseService) =>
+app.MapGet("/api/expenses", async ([FromServices] IExpenseService expenseService) =>
 {
-	return Results.Ok(expenseService.GetExpenses());
+	return Results.Ok(await expenseService.GetExpensesAsync());
 }).RequireAuthorization();
 
-app.MapPost("/api/expenses/createorupdate", ([FromServices] IExpenseService expenseService, Expense expense) =>
+app.MapPost("/api/expenses/createorupdate", async ([FromServices] IExpenseService expenseService, Expense expense) =>
 {
-	return Results.Ok(expenseService.CreateOrUpdate(expense));
+	return Results.Ok(await expenseService.CreateOrUpdateAsync(expense));
 }).RequireAuthorization();
 
-app.MapDelete("/api/expenses/delete", ([FromServices] IExpenseService expenseService, Guid id) =>
+app.MapDelete("/api/expenses/delete", async ([FromServices] IExpenseService expenseService, Guid id) =>
 {
-	return Results.Ok(expenseService.Delete(id));
+	return Results.Ok(await expenseService.DeleteAsync(id));
 }).RequireAuthorization();
 
-app.MapPut("/api/expenses/reactivate", ([FromServices] IExpenseService expenseService, Guid id) =>
+app.MapPut("/api/expenses/reactivate", async ([FromServices] IExpenseService expenseService, Guid id) =>
 {
-	return Results.Ok(expenseService.Reactivate(id));
+	return Results.Ok(await expenseService.ReactivateAsync(id));
 }).RequireAuthorization();
 
 app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
