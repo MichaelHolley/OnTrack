@@ -10,10 +10,10 @@ namespace API.Services
 {
 	public interface IAuthService
 	{
-		User Authenticate(Payload payload);
+		Task<User> AuthenticateAsync(Payload payload);
 		JwtSecurityToken GenerateAccessToken(string secret, string issuer, User user);
 		string GenerateRefreshToken();
-		string GenerateAndSetUserRefreshToken(User user);
+		Task<string> GenerateAndSetUserRefreshTokenAsync(User user);
 		ClaimsPrincipal GetPrincipalFromExpiredToken(string token, string secret, string issuer);
 
 	}
@@ -27,9 +27,9 @@ namespace API.Services
 			this.userService = userService;
 		}
 
-		public User Authenticate(Payload payload)
+		public async Task<User> AuthenticateAsync(Payload payload)
 		{
-			return FindUserOrAdd(payload);
+			return await FindUserOrAddAsync(payload);
 		}
 
 		public JwtSecurityToken GenerateAccessToken(string secret, string issuer, User user)
@@ -51,11 +51,11 @@ namespace API.Services
 			return token;
 		}
 
-		public string GenerateAndSetUserRefreshToken(User user)
+		public async Task<string> GenerateAndSetUserRefreshTokenAsync(User user)
 		{
 			var refreshToken = GenerateRefreshToken();
 
-			userService.UpdateUserRefreshToken(user.Id, refreshToken);
+			await userService.UpdateUserRefreshTokenAsync(user.Id, refreshToken);
 
 			return refreshToken;
 		}
@@ -95,9 +95,9 @@ namespace API.Services
 			return principal;
 		}
 
-		private User FindUserOrAdd(Payload payload)
+		private async Task<User> FindUserOrAddAsync(Payload payload)
 		{
-			var u = userService.GetUserByMail(payload.Email);
+			var u = await userService.GetUserByMailAsync(payload.Email);
 
 			if (u == null)
 			{
@@ -109,7 +109,7 @@ namespace API.Services
 					OAuthIssuer = payload.Issuer
 				};
 
-				userService.AddUser(u);
+				await userService.AddUserAsync(u);
 			}
 
 			return u;

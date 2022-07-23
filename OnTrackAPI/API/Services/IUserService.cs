@@ -6,10 +6,10 @@ namespace API.Services
 {
 	public interface IUserService
 	{
-		User GetUserById(Guid id);
-		User GetUserByMail(string mail);
-		void AddUser(User user);
-		void UpdateUserRefreshToken(Guid userId, string? refreshToken);
+		Task<User> GetUserByIdAsync(Guid id);
+		Task<User> GetUserByMailAsync(string mail);
+		Task AddUserAsync(User user);
+		Task UpdateUserRefreshTokenAsync(Guid userId, string? refreshToken);
 	}
 
 	public class UserService : IUserService
@@ -19,49 +19,43 @@ namespace API.Services
 		private FilterDefinitionBuilder<User> filterBuilder = Builders<User>.Filter;
 
 		public UserService(
-			IOptions<OnTrackDatabaseSettings> onTrackDatabaseSettings)
+			IOptions<OnTrackDatabaseSettings> onTrackDatabaseSettings,
+			ICollectionConnector collectionConnector)
 		{
-			var mongoClient = new MongoClient(
-						  onTrackDatabaseSettings.Value.ConnectionString);
-
-			var mongoDatabase = mongoClient.GetDatabase(
-				onTrackDatabaseSettings.Value.DatabaseName);
-
-			userCollection = mongoDatabase.GetCollection<User>(
-				onTrackDatabaseSettings.Value.UsersCollectionName);
+			userCollection = collectionConnector.GetCollectionByName<User>(onTrackDatabaseSettings.Value.UsersCollectionName);
 		}
 
-		public void AddUser(User user)
+		public async Task AddUserAsync(User user)
 		{
 			user.Id = Guid.NewGuid();
 			user.Created = DateTime.UtcNow;
 
-			userCollection.InsertOne(user);
+			await userCollection.InsertOneAsync(user);
 		}
 
-		public User GetUserByMail(string mail)
+		public async Task<User> GetUserByMailAsync(string mail)
 		{
 			var filter = filterBuilder.Eq(a => a.Email, mail);
-			return userCollection.Find(filter).SingleOrDefault();
+			return (await userCollection.FindAsync(filter)).SingleOrDefault();
 		}
 
-		public User GetUserById(Guid id)
+		public async Task<User> GetUserByIdAsync(Guid id)
 		{
 			var filter = filterBuilder.Eq(a => a.Id, id);
-			return userCollection.Find(filter).SingleOrDefault();
+			return (await userCollection.FindAsync(filter)).SingleOrDefault();
 		}
 
-		public void UpdateUserRefreshToken(Guid userId, string? refreshToken)
+		public async Task UpdateUserRefreshTokenAsync(Guid userId, string? refreshToken)
 		{
 			var filter = filterBuilder.Eq(a => a.Id, userId);
-			var existing = userCollection.Find(filter).SingleOrDefault();
+			var existing = (await userCollection.FindAsync(filter)).SingleOrDefault();
 
 			if (existing != default)
 			{
 				existing.RefreshToken = refreshToken;
 				existing.LastRefresh = DateTime.UtcNow;
 
-				userCollection.ReplaceOne(filter, existing);
+				await userCollection.ReplaceOneAsync(filter, existing);
 			}
 		}
 	}

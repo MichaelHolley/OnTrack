@@ -7,10 +7,10 @@ namespace API.Services
 {
 	public interface IExpenseService
 	{
-		ICollection<Expense> GetExpenses();
-		Expense CreateOrUpdate(Expense expense);
-		Expense Delete(Guid id);
-		Expense Reactivate(Guid id);
+		Task<ICollection<Expense>> GetExpensesAsync();
+		Task<Expense> CreateOrUpdateAsync(Expense expense);
+		Task<Expense?> DeleteAsync(Guid id);
+		Task<Expense?> ReactivateAsync(Guid id);
 	}
 
 	public class ExpenseService : IExpenseService
@@ -20,25 +20,20 @@ namespace API.Services
 		private FilterDefinitionBuilder<Expense> filterBuilder = Builders<Expense>.Filter;
 
 		public ExpenseService(
-			IOptions<OnTrackDatabaseSettings> onTrackDatabaseSettings, IHttpContextAccessor httpContextAccessor)
+			IOptions<OnTrackDatabaseSettings> onTrackDatabaseSettings,
+			IHttpContextAccessor httpContextAccessor,
+			ICollectionConnector collectionConnector)
 		{
-			var mongoClient = new MongoClient(
-				onTrackDatabaseSettings.Value.ConnectionString);
-
-			var mongoDatabase = mongoClient.GetDatabase(
-				onTrackDatabaseSettings.Value.DatabaseName);
-
-			expenseCollection = mongoDatabase.GetCollection<Expense>(onTrackDatabaseSettings.Value.ExpensesCollectionName);
-
+			expenseCollection = collectionConnector.GetCollectionByName<Expense>(onTrackDatabaseSettings.Value.ExpensesCollectionName);
 			this.httpContextAccessor = httpContextAccessor;
 		}
 
-		public Expense CreateOrUpdate(Expense item)
+		public async Task<Expense> CreateOrUpdateAsync(Expense item)
 		{
 			var userId = httpContextAccessor.HttpContext.GetUserId();
 			var filter = filterBuilder.Where(t => t.Id.Equals(item.Id) && t.UserId.Equals(userId));
 
-			var existing = expenseCollection.Find(filter).SingleOrDefault();
+			var existing = (await expenseCollection.FindAsync(filter)).SingleOrDefault();
 
 			if (existing != default)
 			{
@@ -48,7 +43,7 @@ namespace API.Services
 				existing.Amount = item.Amount;
 				existing.Modified = DateTime.UtcNow;
 
-				expenseCollection.ReplaceOne(filter, existing);
+				await expenseCollection.ReplaceOneAsync(filter, existing);
 				return existing;
 			}
 			else
@@ -63,47 +58,47 @@ namespace API.Services
 				expense.Created = DateTime.UtcNow;
 				expense.UserId = userId;
 
-				expenseCollection.InsertOne(expense);
+				await expenseCollection.InsertOneAsync(expense);
 				return expense;
 			}
 		}
 
-		public Expense Delete(Guid id)
+		public async Task<Expense?> DeleteAsync(Guid id)
 		{
 			var userId = httpContextAccessor.HttpContext.GetUserId();
 			var filter = filterBuilder.Where(t => t.Id.Equals(id) && t.UserId.Equals(userId));
 
-			var existing = expenseCollection.Find(filter).SingleOrDefault();
+			var existing = (await expenseCollection.FindAsync(filter)).SingleOrDefault();
 
 			if (existing != default)
 			{
 				existing.Deleted = DateTime.UtcNow;
-				expenseCollection.ReplaceOne(filter, existing);
+				await expenseCollection.ReplaceOneAsync(filter, existing);
 			}
 
 			return existing;
 		}
 
-		public Expense Reactivate(Guid id)
+		public async Task<Expense?> ReactivateAsync(Guid id)
 		{
 			var userId = httpContextAccessor.HttpContext.GetUserId();
 			var filter = filterBuilder.Where(t => t.Id.Equals(id) && t.UserId.Equals(userId));
 
-			var existing = expenseCollection.Find(filter).SingleOrDefault();
+			var existing = (await expenseCollection.FindAsync(filter)).SingleOrDefault();
 
 			if (existing != default)
 			{
 				existing.Deleted = null;
-				expenseCollection.ReplaceOne(filter, existing);
+				await expenseCollection.ReplaceOneAsync(filter, existing);
 			}
 
 			return existing;
 		}
 
-		public ICollection<Expense> GetExpenses()
+		public async Task<ICollection<Expense>> GetExpensesAsync()
 		{
 			var userId = httpContextAccessor.HttpContext.GetUserId();
-			return expenseCollection.Find(a => a.UserId.Equals(userId)).ToList();
+			return (await expenseCollection.FindAsync(a => a.UserId.Equals(userId))).ToList();
 		}
 	}
 }
