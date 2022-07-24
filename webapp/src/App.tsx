@@ -20,6 +20,7 @@ import { refreshApiToken, useUser } from './providers/UserContext';
 import Activities from './views/Activities';
 import Expenses from './views/Expenses';
 import Home from './views/Home';
+import LoggedOut from './views/LoggedOut';
 import Todo from './views/Todo';
 
 axios.interceptors.request.use(
@@ -80,6 +81,10 @@ function App() {
 
 	const userContext = useUser();
 
+	const isUserLoggedIn = () => {
+		return userContext.user && userContext.googleResponse;
+	};
+
 	return (
 		<BrowserRouter>
 			<ColorSchemeProvider
@@ -99,35 +104,38 @@ function App() {
 							})}>
 							<LoadingOverlay visible={loading} />
 
-							<LoginSection />
-
-							{userContext.user && userContext.googleResponse && (
-								<Routes>
-									<Route path="" element={<Home setLoading={setLoading} />} />
-									<Route
-										path="activities"
-										element={
-											<Activities
-												setLoading={setLoading}
-												showCreateButton={true}
-											/>
-										}
-									/>
-									<Route
-										path="todo"
-										element={
-											<Todo
-												setLoading={setLoading}
-												showComplete={true}
-												flatDistributionIndicator={true}
-											/>
-										}
-									/>
-									<Route
-										path="expenses"
-										element={<Expenses setLoading={setLoading} />}
-									/>
-								</Routes>
+							{isUserLoggedIn() ? (
+								<>
+									<LoginSection />
+									<Routes>
+										<Route path="" element={<Home setLoading={setLoading} />} />
+										<Route
+											path="activities"
+											element={
+												<Activities
+													setLoading={setLoading}
+													showCreateButton={true}
+												/>
+											}
+										/>
+										<Route
+											path="todo"
+											element={
+												<Todo
+													setLoading={setLoading}
+													showComplete={true}
+													flatDistributionIndicator={true}
+												/>
+											}
+										/>
+										<Route
+											path="expenses"
+											element={<Expenses setLoading={setLoading} />}
+										/>
+									</Routes>
+								</>
+							) : (
+								<LoggedOut />
 							)}
 						</AppShell>
 					</ModalsProvider>

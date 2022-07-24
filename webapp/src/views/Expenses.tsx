@@ -157,7 +157,7 @@ const Expenses: FunctionComponent<Props> = (props) => {
 				</SimpleGrid>
 				<Space h={'lg'} />
 				<Group position="right">
-					<Button type="submit">Save</Button>
+					<Button type="submit" variant='light'>Save</Button>
 				</Group>
 			</form>
 			<Space h={'lg'} />

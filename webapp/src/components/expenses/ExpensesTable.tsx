@@ -5,7 +5,7 @@ import {
 	Switch,
 	Table,
 	Text,
-	useMantineTheme
+	useMantineTheme,
 } from '@mantine/core';
 import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
 import { useModals } from '@mantine/modals';
@@ -15,8 +15,10 @@ import { ArrowBackUp, Pencil, Trash } from 'tabler-icons-react';
 import { Expense, Rythm } from '../../models';
 import {
 	deleteExpense,
-	reactivateExpense
+	reactivateExpense,
 } from '../../providers/ExpenseService';
+import SortableHeader from '../common/SortableHeader';
+import SortingIndicator from '../common/SortingIndicator';
 
 interface Props {
 	setLoading: (val: boolean) => void;
@@ -25,7 +27,7 @@ interface Props {
 	edit: (expense: Expense) => void;
 }
 
-type SortProperty = 'amount' | 'ryhtm' | 'created';
+type SortProperty = 'title' | 'amount' | 'rythm' | 'created';
 
 const ExpensesTable: FunctionComponent<Props> = (props) => {
 	const theme = useMantineTheme();
@@ -76,21 +78,28 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 
 		let sortedRes: Expense[] = props.data.slice(0);
 		switch (sortBy) {
-			case 'amount':
+			case 'title':
 				sortedRes = sortedRes.sort((a, b) =>
-					sorted.ascending ? a.amount - b.amount : b.amount - a.amount
+					sorted.ascending
+						? b.title.localeCompare(a.title)
+						: a.title.localeCompare(b.title)
 				);
 				break;
-			case 'ryhtm':
+			case 'amount':
 				sortedRes = sortedRes.sort((a, b) =>
-					sorted.ascending ? a.rythm - b.rythm : b.rythm - a.rythm
+					sorted.ascending ? b.amount - a.amount : a.amount - b.amount
+				);
+				break;
+			case 'rythm':
+				sortedRes = sortedRes.sort((a, b) =>
+					sorted.ascending ? b.rythm - a.rythm : a.rythm - b.rythm
 				);
 				break;
 			case 'created':
 				sortedRes = sortedRes.sort((a, b) =>
 					sorted.ascending
-						? new Date(a.created).getTime() - new Date(b.created).getTime()
-						: new Date(b.created).getTime() - new Date(a.created).getTime()
+						? new Date(b.created).getTime() - new Date(a.created).getTime()
+						: new Date(a.created).getTime() - new Date(b.created).getTime()
 				);
 				break;
 		}
@@ -116,10 +125,30 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 				}}>
 				<thead>
 					<tr>
-						<th>Title</th>
-						<th onClick={() => sortExpenses('amount')}>Amount</th>
-						<th onClick={() => sortExpenses('ryhtm')}>Rythm</th>
-						<th onClick={() => sortExpenses('created')}>Created</th>
+						<SortableHeader
+							title="Title"
+							sortParam="title"
+							currentSorting={sorted}
+							sortItems={() => sortExpenses('title')}
+						/>
+						<SortableHeader
+							title="Amount"
+							sortParam="amount"
+							currentSorting={sorted}
+							sortItems={() => sortExpenses('amount')}
+						/>
+						<SortableHeader
+							title="Rythm"
+							sortParam="rythm"
+							currentSorting={sorted}
+							sortItems={() => sortExpenses('rythm')}
+						/>
+						<SortableHeader
+							title="Created"
+							sortParam="created"
+							currentSorting={sorted}
+							sortItems={() => sortExpenses('created')}
+						/>
 						{showDeleted && <th>Deleted</th>}
 						<th></th>
 					</tr>

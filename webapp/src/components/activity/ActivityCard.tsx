@@ -45,7 +45,7 @@ export const ActivityCard: FunctionComponent<Props> = (props) => {
 	const deleteConfirmModal = () =>
 		modals.openConfirmModal({
 			title: 'Delete activity',
-			children: <Text size="sm">This action requires your confirmation.</Text>,
+			children: <Text size="sm">This action requires your confirmation and can not be undone.</Text>,
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
 			onCancel: () => {
 				resetEditActivityModal();
