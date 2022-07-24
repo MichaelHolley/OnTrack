@@ -14,3 +14,6 @@ https://github.com/MichaelHolley/OnTrack/projects/1
 
 ### Todo
 ![Todo](https://user-images.githubusercontent.com/47337897/171938819-faf009d2-1f39-4703-8e45-249d081fb35f.png)
+
+### Expenses
+![Expenses](https://user-images.githubusercontent.com/47337897/180663276-a0dedf74-1467-4b54-8231-4cd733b89e67.png)
