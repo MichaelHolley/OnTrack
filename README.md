@@ -1,6 +1,9 @@
 # OnTrack
 Track Activities and Todo-Items with this expanding Dashboard, requiring only a Google-Login.
 
+- Track activities within interactive charts
+- Manage todos split into three steps
+- Track monthly expenses
 - Available Dark- and Bright-Theme
 
 ## Backlog
