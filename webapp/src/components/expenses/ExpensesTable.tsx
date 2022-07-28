@@ -5,7 +5,7 @@ import {
 	Switch,
 	Table,
 	Text,
-	useMantineTheme,
+	useMantineTheme
 } from '@mantine/core';
 import { UseListStateHandler } from '@mantine/hooks/lib/use-list-state/use-list-state';
 import { useModals } from '@mantine/modals';
@@ -15,10 +15,9 @@ import { ArrowBackUp, Pencil, Trash } from 'tabler-icons-react';
 import { Expense, Rythm } from '../../models';
 import {
 	deleteExpense,
-	reactivateExpense,
+	reactivateExpense
 } from '../../providers/ExpenseService';
 import SortableHeader from '../common/SortableHeader';
-import SortingIndicator from '../common/SortingIndicator';
 
 interface Props {
 	setLoading: (val: boolean) => void;
