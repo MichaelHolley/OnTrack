@@ -19,6 +19,7 @@ import {
 	MoonStars,
 	Sun,
 } from 'tabler-icons-react';
+import { useUser } from '../../providers/UserContext';
 
 const useStyles = createStyles((theme, _params, getRef) => {
 	const icon = getRef('icon');
@@ -126,6 +127,12 @@ export default function VerticalNavbar() {
 	const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 	const isDark = colorScheme === 'dark';
 
+	const userContext = useUser();
+
+	const isUserLoggedIn = () => {
+		return userContext.user && userContext.googleResponse;
+	};
+
 	const links = routes.map((item) => (
 		<Link
 			className={cx(classes.link, {
@@ -166,7 +173,7 @@ export default function VerticalNavbar() {
 					</ActionIcon>
 					<Image src="logo-310.png" height={24} />
 				</Group>
-				{links}
+				{isUserLoggedIn() && links}
 			</Navbar.Section>
 
 			<Navbar.Section>

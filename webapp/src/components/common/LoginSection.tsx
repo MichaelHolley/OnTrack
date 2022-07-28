@@ -1,5 +1,5 @@
 import { Avatar, Group } from '@mantine/core';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import GoogleLogin, {
 	GoogleLoginResponse,
 	GoogleLoginResponseOffline,
@@ -12,7 +12,11 @@ import {
 	revokeApiToken,
 } from '../../providers/UserContext';
 
-const LoginSection = () => {
+interface Props {
+	buttonAlignment?: 'right' | 'center';
+}
+
+const LoginSection: FunctionComponent<Props> = (props) => {
 	const userContext = useUser();
 
 	const clearStoredData = () => {
@@ -37,7 +41,7 @@ const LoginSection = () => {
 	}
 
 	return (
-		<Group position="right">
+		<Group position={props.buttonAlignment ?? 'right'}>
 			{userContext.googleResponse && userContext.user ? (
 				<>
 					<Avatar

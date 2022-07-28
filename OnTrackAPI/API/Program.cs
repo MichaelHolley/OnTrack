@@ -130,7 +130,7 @@ app.MapPost("/revoke-token", async ([FromServices] IAuthService authService, [Fr
 		var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
 		var user = await userService.GetUserByIdAsync(Guid.Parse(userId));
 
-		if (userView.TokenId == null || userView.RefreshToken == null || user == null || user.RefreshToken != userView.RefreshToken)
+		if (userView.TokenId == null || userView.RefreshToken == null || user == null)
 		{
 			return Results.BadRequest("Invalid client-request");
 		}

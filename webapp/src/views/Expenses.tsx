@@ -152,12 +152,13 @@ const Expenses: FunctionComponent<Props> = (props) => {
 							label="Color"
 							value={formColor}
 							onChange={setFormColor}
+							required
 						/>
 					</Stack>
 				</SimpleGrid>
 				<Space h={'lg'} />
 				<Group position="right">
-					<Button type="submit">Save</Button>
+					<Button type="submit" variant='light'>Save</Button>
 				</Group>
 			</form>
 			<Space h={'lg'} />
