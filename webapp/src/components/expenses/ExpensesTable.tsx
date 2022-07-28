@@ -48,7 +48,7 @@ const ExpensesTable: FunctionComponent<Props> = (props) => {
 		{
 			from: { x: -100, opacity: 0 },
 			enter: (item, index) => (next) =>
-				next({ x: 0, opacity: 1, delay: initialLoad ? 100 * (index + 1) : 0 }),
+				next({ x: 0, opacity: 1, delay: initialLoad ? 80 * (index + 1) : 0 }),
 			onRest: () => setInitialLoad(false),
 		}
 	);

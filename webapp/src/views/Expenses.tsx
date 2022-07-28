@@ -152,6 +152,7 @@ const Expenses: FunctionComponent<Props> = (props) => {
 							label="Color"
 							value={formColor}
 							onChange={setFormColor}
+							required
 						/>
 					</Stack>
 				</SimpleGrid>
