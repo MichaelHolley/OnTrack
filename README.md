@@ -9,6 +9,9 @@ Track Activities and Todo-Items with this expanding Dashboard, requiring only a 
 ## Backlog
 https://github.com/MichaelHolley/OnTrack/projects/1
 
+## Setup
+- Add Google-Configuration details in appsettings.json and .env
+
 ### Home
 ![image](https://user-images.githubusercontent.com/47337897/171941183-8a2e89e3-0a65-47b1-893f-2725d44d56cd.png)
 
